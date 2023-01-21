@@ -1,0 +1,24 @@
+.j-container {
+  box-sizing: border-box;
+  * {
+    box-sizing: border-box;
+    &::before,
+    &::after {
+      box-sizing: border-box;
+    }
+  }
+  width: 100%;
+  max-width: 1280px;
+  padding: 0 40px;
+  margin: 0 auto;
+  &.w {
+    max-width: unset;
+    padding: 0;
+  }
+  @media (max-width: $mdBreakPoint) {
+    padding: 0 24px;
+  }
+  @media (max-width: $smBreakPoint) {
+    padding: 0 20px;
+  }
+}
