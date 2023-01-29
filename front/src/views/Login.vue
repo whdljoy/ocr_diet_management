@@ -1,8 +1,12 @@
 <template>
-  <div class="j-container">
-    <p-input v-model="id" label="아이디" />
-    <p-input v-model="password" label="비밀번호" />
-    <p-btn>로그인</p-btn>
+  <div class="login__wrapper">
+    login
+    <p-input v-model="userId" label="아이디" />
+    <p-input v-model="passWord" label="비밀번호" />
+    <div class="btn__container">
+      <p-btn theme="secondary" @click="goToRegister">회원 가입</p-btn>
+      <p-btn> 로그인</p-btn>
+    </div>
   </div>
 </template>
 
@@ -11,14 +15,26 @@ export default {
   name: "loginPage",
   data() {
     return {
-      id: "",
-      password: "",
+      userId: "",
+      passWord: "",
     };
   },
   methods: {
-    postLogin() {},
+    goToRegister() {
+      this.$router.push({
+        name: "register",
+      });
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.login__wrapper {
+  max-width: 1280px;
+  .btn__container {
+    gap: 12px;
+    display: flex;
+  }
+}
+</style>
