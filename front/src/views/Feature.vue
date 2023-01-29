@@ -1,25 +1,16 @@
-<template>
+<template lang="html">
   <div class="border-box">
-    <section
-      class="p-container local-padding-y d-flex flex-column flex-lg-row align-center justify-center justify-lg-space-between text-center text-lg-left"
-    >
-      <div>
+    <section class="p-container feature__container my-10">
+      <div class="d-flex flex-column align-center">
         <p class="top-title-h1">
-          당신의 성공여정에<br />
-          필요한 모든 기능을<br />
-          담았습니다
+          일정관리와 식단관리를 <br />
+          한번에
         </p>
-        <button
-          class="mt-6 mt-lg-10 rounded-lg py-4 px-8 register-top-btn"
-          @click.stop="goToRegister"
-        >
-          무료로 시작하기
-        </button>
+        <p-btn @click.stop="goToRegister" theme="secondary" large>
+          시작하기
+        </p-btn>
       </div>
-      <!-- <img
-        src="https://file.poincampus.com/assets/poin-home/feature/img_fun_1.png"
-        class="main-top-image lazy mt-10 mt-lg-0"
-      /> -->
+      <img src="@/assets/main.png" class="main-top-image rounded-lg lazy" />
     </section>
 
     <section
@@ -30,13 +21,7 @@
     >
       <div class="p-container d-flex flex-column align-center">
         <div class="d-flex mb-10 flex-column align-center">
-          <p class="top-tag mb-5 mb-lg-10" :style="{ color: feature.tagColor }">
-            {{ feature.tag }}
-          </p>
-          <p
-            class="text-main-title"
-            v-html="isMobile ? feature.mbTitle : feature.title"
-          ></p>
+          <p class="text-main-title" v-html="feature.title"></p>
         </div>
         <div
           class="d-flex flex-column align-lg-center my-10"
@@ -88,20 +73,11 @@
             </div>
           </div>
         </div>
-        <div
-          v-if="feature.tag === 'Build'"
-          class="d-flex flex-column justify-center align-center"
-        >
+        <div class="d-flex flex-column justify-center align-center mb-10">
           <img
             class="add-img"
             :src="isMobile ? feature.addMobileImage : feature.addImage"
           />
-          <button
-            class="mt-5 mt-lg-10 rounded-lg py-4 px-8 register-top-btn"
-            @click.stop="goToRegister"
-          >
-            무료로 시작하기
-          </button>
         </div>
       </div>
     </section>
@@ -118,10 +94,7 @@ export default {
     return {
       features: [
         {
-          tag: "Build",
-          mbTitle: `당신만의 브랜드를 <br/> 구축하고, <br /> 콘텐츠 판매를 시작하세요!`,
           title: `당신만의 브랜드를 구축하고, <br /> 콘텐츠 판매를 시작하세요!`,
-          tagColor: "#EFAD2A",
           bgColor: "#FFFAF2",
           addImage:
             "https://file.poincampus.com/assets/poin-home/feature/img_build_4.png",
@@ -217,84 +190,10 @@ export default {
             },
           ],
         },
-        {
-          tag: "Grow",
-          mbTitle:
-            "다양한 도구로<br/>인사이트를 얻고,<br/>더 큰 수익을 창출하세요!",
-          title: "다양한 도구로 인사이트를 얻고, 더 큰 수익을 창출하세요!",
-          tagColor: "#EF7C2A",
-          bgColor: "#FFFFFF",
-          items: [
-            {
-              subtitle: "관리는 더 적게, 수익은 더 많이",
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_grow_1-1.png",
-              reverse: false,
-              isList: true,
-              lists: [
-                {
-                  listTitle: "결제시스템 자동 연동",
-                  listContent:
-                    "번거로움 없이 결제 시스템을 자동으로 연동하여 사용할 수 있습니다.",
-                  active: false,
-                },
-                {
-                  listTitle: "매출 통계 분석",
-                  listContent:
-                    "대시보드를 통해 매출을 한눈에 파악하고 내야하는 세금 내역까지 다운로드 받을 수 있습니다.",
-                  active: false,
-                },
-                {
-                  listTitle: "프로모션",
-                  listContent:
-                    "다양한 프로모션으로 프로덕트 판매를 촉진시키세요.",
-                  active: false,
-                },
-              ],
-            },
-            {
-              subtitle: "더 많은 인사이트를 얻으세요",
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_grow_2.png",
-              reverse: false,
-              isList: true,
-              lists: [
-                {
-                  listTitle: "회원 활동 분석",
-                  listContent:
-                    "각 회원들마다 프로덕트에 잘 참여하고 있는지, 인기가 많은 프로덕트가 무엇인지 확인하고 계속해서 개선해 나가세요.",
-                  active: false,
-                },
-              ],
-            },
-          ],
-        },
-        {
-          tag: "Scale Up",
-          mbTitle:
-            "여러분의 성공에는<br/>제한이 없습니다<br/>계속해서 달려나가세요!",
-          title: "여러분의 성공에는 제한이 없습니다<br/>계속해서 달려나가세요!",
-          tagColor: "#EF4B2A",
-          bgColor: "#FFF6F4",
-          items: [
-            {
-              reverse: false,
-              subtitle: `비즈니스를 확장하고<br />여러 명이서 더욱 편리하게 관리하세요`,
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_scaleup_1.png",
-              isList: false,
-              description: `나만의 웹사이트가 성장했다면,<br />직원을 초대하여 함께 비즈니스를 확장해 보세요.`,
-            },
-          ],
-        },
       ],
     };
   },
-  computed: {
-    ...mapGetters({
-      isMobile: "common/isMobile",
-    }),
-  },
+  computed: {},
   methods: {
     iconColor(active) {
       if (active) {
@@ -325,6 +224,12 @@ export default {
 <style scoped lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Song+Myung&display=swap");
 
+.feature__container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  justify-content: center;
+}
 .top-title {
   font-size: 52px;
   font-weight: bold;
@@ -415,5 +320,18 @@ export default {
   font-size: 16px;
   color: $gray7;
   overflow-wrap: normal;
+}
+.top-title-h1 {
+  font-size: 52px;
+  font-weight: bold;
+  font-stretch: normal;
+  line-height: 1.3;
+  letter-spacing: 0;
+  @media (max-width: $mdBreakPoint) {
+    font-size: 48px;
+  }
+  @media (max-width: $smBreakPoint) {
+    font-size: 40px;
+  }
 }
 </style>

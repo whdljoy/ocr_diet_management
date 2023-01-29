@@ -14,13 +14,13 @@ export default new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    users: {
-      ...users,
-      actions: users.actions(api),
-    },
-    calender: {
-      ...calender,
-      actions: calender.actions(api),
-    },
+    // users: {
+    //   ...users,
+    //   actions: users.actions(api),
+    // },
+    // calender: {
+    //   ...calender,
+    //   actions: calender.actions(api),
+    // },
   },
 });
