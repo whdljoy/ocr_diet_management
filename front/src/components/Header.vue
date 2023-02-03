@@ -2,38 +2,15 @@
   <header class="header__container border-box">
     <div class="header__wrap">
       <poin-logo class="mr-10" />
-
-      <routing-menu class="mr-auto" />
-
-      <template v-if="campusOnly">
-        <div v-if="!authenticated" class="login__wrap">
-          <span @click="logInOut">{{ text.logIn }}</span>
-          |
-          <span @click="toJoinPath">{{ text.join }}</span>
-        </div>
-        <template v-else>
-          <router-link
-            :to="{
-              name: 'campus-playlist',
-              params: { ...$route.params, campusDomain: domain },
-            }"
-            class="playlist-btn"
-            >내 진행상황</router-link
-          >
-          <user-profile />
-        </template>
-      </template>
-
-      <template v-else>
-        <router-link style="all: unset" :to="{ name: 'campus-register' }">
-          <button v-if="!loading && !campusYn" class="campus-register-btn">
-            {{ text.campusRegister }}
+      <template>
+        <router-link style="all: unset" :to="{ name: 'login' }">
+          <button class="campus-register-btn">
+            {{ text.join }}
           </button>
         </router-link>
-        <button v-if="!authenticated" @click="logInOut" class="login-btn">
+        <button @click="toLogin" class="login-btn">
           {{ text.logIn }}
         </button>
-        <user-profile v-else class="ml-3" />
       </template>
     </div>
   </header>
@@ -41,24 +18,28 @@
 
 <script>
 import { mapGetters } from "vuex";
-import globalMixin from "@/mixins/global";
 
 export default {
-  name: "poin-header",
+  name: "featureHeader",
   components: {},
-  mixins: [globalMixin],
   data() {
     return {
       loading: false,
       text: {
         logIn: "로그인",
         join: "회원가입",
-        campusRegister: "무료로 시작하기",
       },
     };
   },
   computed: {
     ...mapGetters({}),
+  },
+  methods: {
+    toLogin() {
+      this.$router.push({
+        name: "login",
+      });
+    },
   },
 };
 </script>
@@ -86,6 +67,7 @@ export default {
   flex-direction: row;
   align-items: center;
   margin: 0 auto;
+  justify-content: flex-end;
 }
 .header__container .login__wrap {
   font-size: 12px;
@@ -134,17 +116,5 @@ export default {
     background-color: $primary800;
     border-color: $primary800;
   }
-}
-.playlist-btn {
-  font-size: 14px;
-  color: $black;
-  border: 1px solid $white;
-  font-weight: 500;
-  padding: 8px 12px;
-  line-height: 22px;
-  border-radius: 8px;
-  margin-right: 12px;
-  position: relative;
-  @include hover-before;
 }
 </style>

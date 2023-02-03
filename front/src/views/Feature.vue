@@ -1,5 +1,6 @@
 <template lang="html">
   <div class="border-box">
+    <Header />
     <section class="p-container feature__container my-10">
       <div class="d-flex flex-column align-center">
         <p class="top-title-h1">
@@ -86,10 +87,12 @@
 
 <script>
 import { mapGetters } from "vuex";
-
+import Header from "@/components/Header";
 export default {
   name: "featurePage",
-
+  components: {
+    Header,
+  },
   data() {
     return {
       features: [
