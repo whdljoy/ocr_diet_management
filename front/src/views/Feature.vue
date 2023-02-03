@@ -75,10 +75,7 @@
           </div>
         </div>
         <div class="d-flex flex-column justify-center align-center mb-10">
-          <img
-            class="add-img"
-            :src="isMobile ? feature.addMobileImage : feature.addImage"
-          />
+          <img class="add-img" :src="feature.addImage" />
         </div>
       </div>
     </section>

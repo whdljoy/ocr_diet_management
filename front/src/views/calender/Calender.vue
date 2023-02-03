@@ -1,5 +1,6 @@
 <template>
   <div>
+    <calenderHeader />
     <p-calendar
       class="custom-calendar max-w-full"
       is-expanded
@@ -24,10 +25,12 @@
 
 <script>
 import Day from "@/components/Day";
+import CalenderHeader from "@/components/CalenderHeader";
 export default {
   name: "CalenderPage",
   components: {
     Day,
+    CalenderHeader,
   },
   data() {
     return {
