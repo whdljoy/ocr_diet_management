@@ -7,7 +7,7 @@
           일정관리와 식단관리를 <br />
           한번에
         </p>
-        <p-btn @click.stop="goToRegister" theme="secondary" large>
+        <p-btn @click.stop="goToRegister" theme="secondary" large class="mt-5">
           시작하기
         </p-btn>
       </div>

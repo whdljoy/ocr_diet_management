@@ -11,7 +11,7 @@ import PSelect from "@/components/common/Select";
 import PSwitch from "@/components/common/Switch";
 import PTable from "@/components/common/Table";
 import PCheckbox from "@/components/common/Checkbox";
-
+import Calendar from "v-calendar/lib/components/calendar.umd";
 Vue.config.productionTip = false;
 Vue.component("PBtn", PBtn);
 Vue.component("PInput", PInput);
@@ -21,6 +21,7 @@ Vue.component("PTable", PTable);
 Vue.component("PCheckbox", PCheckbox);
 Vue.component("PChip", PChip);
 Vue.component("PSwitch", PSwitch);
+Vue.component("PCalendar", Calendar);
 
 new Vue({
   router,
