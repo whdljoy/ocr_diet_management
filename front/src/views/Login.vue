@@ -7,7 +7,7 @@
       <p-input v-model="passWord" label="비밀번호" />
       <div class="btn__container mt-10">
         <p-btn theme="secondary" @click="goToRegister">회원 가입</p-btn>
-        <p-btn> 로그인</p-btn>
+        <p-btn @click="reqGetUser"> 로그인</p-btn>
       </div>
     </div>
     <register :dialog="dialog" @close="dialog = false" />
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import Register from "@/components/Register";
 export default {
   name: "loginPage",
@@ -29,6 +30,20 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      getUser: "users/reqGetUser",
+    }),
+    async reqGetUser() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.getUser({
+        email: "hgw4846@gmail.com",
+      });
+      this.loading = false;
+      console.log(result);
+    },
     goToRegister() {
       this.dialog = true;
     },

@@ -1,10 +1,10 @@
 import { endpoint } from "@/config";
 
-export async function getUserInfo({ userId, password }) {
+export async function getUserInfo({ email }) {
   const params = {
-    userId,
+    email,
   };
-  return this.getMethod("get", true, {
+  return this.getMethod("get", {
     url: `${endpoint.users}`,
     params,
   });

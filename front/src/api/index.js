@@ -3,19 +3,15 @@ import apis from "./modules";
 import qs from "qs";
 class ApiClient extends axios.Axios {
   /**
-  @constructor
-  @param {object} config
-  @param {object} options
+   @constructor
+   @param {object} config
+   @param {object} options
    */
-  constructor(config = {}, options, categories) {
-    const axiosConfig = ApiClient.transformToAxiosConfig(config, options);
+  constructor(options, categories) {
+    const axiosConfig = ApiClient.transformToAxiosConfig(options);
     super(axiosConfig);
 
-    this.authConfig = config;
     this.axiosConfig = axiosConfig;
-    this.tokenRefreshing = false;
-    this.tokenUpdateTime = null;
-    this.tryRefreshTokenCount = 0;
     if (categories) {
       this.categories = Object.keys(apis)
         .filter((key) => {
@@ -34,7 +30,7 @@ class ApiClient extends axios.Axios {
 
     // this.updateRequestInterceptors();
     // this.updateResponseInterceptors();
-    this.setParamsSerializer.call(this);
+    // this.setParamsSerializer.call(this);
   }
   setParamsSerializer() {
     this.defaults.paramsSerializer = function (params) {
@@ -50,13 +46,8 @@ class ApiClient extends axios.Axios {
     });
   }
 
-  static transformToAxiosConfig(config, options) {
-    let authConfig = config;
+  static transformToAxiosConfig(options) {
     let axiosOptions = options;
-    if (!authConfig || typeof authConfig !== "object") {
-      authConfig = {};
-    }
-
     if (!axiosOptions || typeof axiosOptions !== "object") {
       axiosOptions = {};
       if (!axiosOptions.baseURL) {
@@ -74,13 +65,11 @@ class ApiClient extends axios.Axios {
       },
       axiosOptions
     );
-    if (authConfig.token) {
-      axiosConfig.headers.Authorization = `Bearer ${authConfig.token}`;
-    }
 
     return axiosConfig;
   }
   getMethod(method, { url, params = {}, data = {}, headers }) {
+    console.log(params);
     if (method === "get") {
       return this.get(url, {
         params,

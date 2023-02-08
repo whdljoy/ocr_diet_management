@@ -4,7 +4,7 @@ const dbConfig = require("./database.js");
 const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-
+const helmet = require("helmet");
 const connection = mysql.createConnection(dbConfig);
 
 const app = express();
@@ -14,8 +14,30 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(morgan("combined"));
 
-app.set("port", process.env.PORT || 5000);
+app.set("port", process.env.PORT || 3306);
 
-app.post("/login", (req, res) => {});
+// login
+app.get("/login", (req, res) => {
+  const params = req.query;
+});
 
-app.listen(5000);
+// User 정보를 반환
+app.get("/user", (req, res) => {
+  const params = req.query;
+  connection.query(
+    `SELECT UserUuid from user where email="${params.email}"`,
+    (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    }
+  );
+});
+// register - 회원 가입
+app.post("/user", (req, res) => {
+  const body = req.body;
+  connection.query(`INSERT INTO user `);
+});
+
+app.listen(app.get("port"), () => {
+  console.log("Express server listening on port " + app.get("port"));
+});
