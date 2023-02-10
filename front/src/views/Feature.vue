@@ -7,7 +7,7 @@
           일정관리와 식단관리를 <br />
           한번에
         </p>
-        <p-btn @click.stop="goToRegister" theme="secondary" large class="mt-5">
+        <p-btn @click.stop="goToRegister" theme="secondary" class="mt-5 px-5">
           시작하기
         </p-btn>
       </div>
@@ -21,7 +21,7 @@
       :style="{ background: feature.bgColor }"
     >
       <div class="p-container d-flex flex-column align-center">
-        <div class="d-flex mb-10 flex-column align-center">
+        <div class="d-flex my-10 flex-column align-center">
           <p class="text-main-title" v-html="feature.title"></p>
         </div>
         <div
@@ -94,7 +94,7 @@ export default {
     return {
       features: [
         {
-          title: `당신만의 브랜드를 구축하고, <br /> 콘텐츠 판매를 시작하세요!`,
+          title: `당신만을 위한 영양성분을 확인하고, <br /> 일정을 관리하세요!`,
           bgColor: "#FFFAF2",
           addImage:
             "https://file.poincampus.com/assets/poin-home/feature/img_build_4.png",
@@ -102,7 +102,7 @@ export default {
             "https://file.poincampus.com/assets/poin-home/feature/mobile.png",
           items: [
             {
-              subtitle: `10분만에<br />당신의 웹사이트를 개설하세요`,
+              subtitle: `간단한 질문으로 당신의 활동대사량을 확인하세요`,
               image:
                 "https://file.poincampus.com/assets/poin-home/feature/img_build_1.png",
               reverse: true,
@@ -126,25 +126,18 @@ export default {
                     "신뢰감을 높일 수 있는 도메인을 설정하고 많은 사람들에게 공유해 보세요.",
                   active: false,
                 },
-                {
-                  listTitle: "소개 페이지, 배너 디자인, 로고",
-                  listContent:
-                    "소개 페이지와 배너 디자인, 로고로 멋지게 나만의 웹사이트를 꾸며 보세요.",
-                  active: false,
-                },
               ],
             },
             {
-              subtitle: `당신이 원하는 방식으로<br />콘텐츠를 구성하세요`,
+              subtitle: `편리한 기록으로 일정과 건강 모두 챙기세요`,
               image:
                 "https://file.poincampus.com/assets/poin-home/feature/img_build_2-1.png",
               isList: true,
               reverse: false,
               lists: [
                 {
-                  listTitle: "동영상,  오디오",
-                  listContent:
-                    "동영상과 학습자료, 외부동영상으로 강의를 구성할 수 있습니다.",
+                  listTitle: "캘린더",
+                  listContent: "캘린더 형식으로 일정을 기록하고 확인하세요.",
                   active: false,
                 },
                 {
@@ -157,33 +150,6 @@ export default {
                   listTitle: "전자책, 이미지, 칼럼",
                   listContent:
                     "뷰어(viewer)와 첨부파일 형식으로 전자책과 칼럼을 구성할 수 있습니다.",
-                  active: false,
-                },
-              ],
-            },
-            {
-              subtitle: `많은 사람에게 웹사이트를 알리고<br />커뮤니티를 구성하세요`,
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_build_3-1.png",
-              reverse: true,
-              isList: true,
-              lists: [
-                {
-                  listTitle: "검색최적화 (SEO)",
-                  listContent:
-                    "검색최적화를 통해 포털사이트에서 당신의 웹사이트가 노출이 잘 되도록 할 수 있습니다.",
-                  active: false,
-                },
-                {
-                  listTitle: "프로덕트별 커뮤니티",
-                  listContent:
-                    "프로덕트, 그룹별로 커뮤니티를 구성해서 소통해 보세요.",
-                  active: false,
-                },
-                {
-                  listTitle: "공지사항 알림",
-                  listContent:
-                    "중요한 공지사항은 알림 ( 메일, PUSH, 카톡 )을 통해서 확인할 수 있습니다.",
                   active: false,
                 },
               ],
@@ -215,7 +181,9 @@ export default {
       );
     },
     goToRegister() {
-      this.$router.push("/register");
+      this.$router.push({
+        name: "login",
+      });
     },
   },
 };

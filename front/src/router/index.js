@@ -15,13 +15,13 @@ const routes = [
     component: () => import("@/views/Login.vue"),
   },
   {
-    path: "/calender",
-    component: () => import("@/views/calender"),
+    path: "/calendar",
+    component: () => import("@/views/calendar"),
     children: [
       {
         path: "",
-        name: "calender",
-        component: () => import("@/views/calender/Calender"),
+        name: "calendar",
+        component: () => import("@/views/calendar/Calendar"),
       },
     ],
   },

@@ -191,32 +191,6 @@ function addDays(date, days) {
   return dateFns.addDays(date, days);
 }
 
-function withinInterval(date, interval) {
-  return dateFns.isWithinRange(
-    new Date(date),
-    new Date(interval.start),
-    new Date(interval.end)
-  );
-}
-
-function getDateOfLastDayOfWeek(date, dayIndex) {
-  const lastWeekDay = dateFns.format(dateFns.addDays(date, -7));
-  const dayList = dateFns.eachDay(lastWeekDay, date);
-  const resultDayIndex = dayList.findIndex((day) => {
-    return dateFns.getDay(day) === dayIndex;
-  });
-  return getDateFormat(dayList[resultDayIndex], "YY.MM.DD (eee)");
-}
-
-function getDateOfNextDayOfWeek(date, dayIndex) {
-  const nextWeekDay = dateFns.format(dateFns.addDays(date, 7));
-  const dayList = dateFns.eachDay(date, nextWeekDay);
-  const resultDayIndex = dayList.findIndex((day) => {
-    return dateFns.getDay(day) === dayIndex;
-  });
-  return getDateFormat(dayList[resultDayIndex], "yyyy-MM-dd (eee)");
-}
-
 function nextDay(date, day) {
   const map = genMap(day);
   return dateFns.addDays(new Date(date), map[dateFns.getDay(new Date(date))]);
@@ -310,10 +284,7 @@ export {
   isAfterDttm,
   isSameDay,
   isBeforeDay,
-  withinInterval,
   addDays,
-  getDateOfLastDayOfWeek,
-  getDateOfNextDayOfWeek,
   nextDay,
   daysOfWeekListENG,
   koTimeAmPm,
