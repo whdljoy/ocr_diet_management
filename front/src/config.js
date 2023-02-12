@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:3306";
+const baseUrl = "http://localhost:5000";
 const endpoint = {
   users: "users",
   calender: "calender",

@@ -193,12 +193,12 @@ export default {
 .p-size--small {
   min-height: 32px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
 }
 .p-size--medium {
   min-height: 40px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
 }
 .p-btn--disabled {
   background-color: $gray2 !important;

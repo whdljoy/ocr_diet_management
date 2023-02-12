@@ -3,11 +3,9 @@
     <div class="header__wrap">
       <poin-logo class="mr-10" />
       <template>
-        <router-link style="all: unset" :to="{ name: 'login' }">
-          <button class="campus-register-btn">
-            {{ text.join }}
-          </button>
-        </router-link>
+        <button @click="toRegister" class="campus-register-btn">
+          {{ text.join }}
+        </button>
         <button @click="toLogin" class="login-btn">
           {{ text.logIn }}
         </button>
@@ -38,6 +36,14 @@ export default {
     toLogin() {
       this.$router.push({
         name: "login",
+      });
+    },
+    toRegister() {
+      this.$router.push({
+        name: "login",
+        params: {
+          isRegister: true,
+        },
       });
     },
   },
@@ -110,7 +116,7 @@ export default {
   transition: all 0.3s ease-in-out;
   height: 40px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.5px;
   &:hover {
     background-color: $primary800;

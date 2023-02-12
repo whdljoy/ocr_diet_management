@@ -74,9 +74,6 @@
             </div>
           </div>
         </div>
-        <div class="d-flex flex-column justify-center align-center mb-10">
-          <img class="add-img" :src="feature.addImage" />
-        </div>
       </div>
     </section>
   </div>
@@ -102,28 +99,21 @@ export default {
             "https://file.poincampus.com/assets/poin-home/feature/mobile.png",
           items: [
             {
-              subtitle: `간단한 질문으로 당신의 활동대사량을 확인하세요`,
+              subtitle: `당신의 활동대사량을 확인하고 목적에 맞게 운동량을 조절하세요`,
               image:
                 "https://file.poincampus.com/assets/poin-home/feature/img_build_1.png",
               reverse: true,
               isList: true,
               lists: [
                 {
-                  listTitle: "반응형 웹사이트",
-                  listContent:
-                    "PC, 모바일 어느 환경에서도 접속할 수 있는 반응형 웹사이트를 만들 수 있습니다.",
+                  listTitle: "활동 대사랑",
+                  listContent: "간단한 정보를 토대로 활동 대사량 알려드립니다.",
                   active: false,
                 },
                 {
-                  listTitle: "바로가기 앱",
+                  listTitle: "영양 성분 분석",
                   listContent:
-                    "클릭 한 번으로 PC, 모바일 캠퍼스 앱이 생성됩니다.",
-                  active: false,
-                },
-                {
-                  listTitle: "자체 도메인 설정",
-                  listContent:
-                    "신뢰감을 높일 수 있는 도메인을 설정하고 많은 사람들에게 공유해 보세요.",
+                    "활동대사량과 운동 목적에 맞게 필요한 영양 성분을 분석하고 제공합니다.",
                   active: false,
                 },
               ],
@@ -141,15 +131,9 @@ export default {
                   active: false,
                 },
                 {
-                  listTitle: "웨비나",
+                  listTitle: "식단 기록",
                   listContent:
-                    "실시간으로 1:1 컨설팅, 웨비나를 운영할 수 있습니다.",
-                  active: false,
-                },
-                {
-                  listTitle: "전자책, 이미지, 칼럼",
-                  listContent:
-                    "뷰어(viewer)와 첨부파일 형식으로 전자책과 칼럼을 구성할 수 있습니다.",
+                    "운동량과 식단을 기록하고 섭취가능한 칼로리를 확인하세요. ",
                   active: false,
                 },
               ],

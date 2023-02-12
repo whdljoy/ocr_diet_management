@@ -10,11 +10,25 @@ export async function getUserInfo({ email }) {
   });
 }
 
-export async function postUsers({ userId, password, nickname = "" }) {
+export async function postUsers({
+  email,
+  password,
+  name,
+  nickname,
+  weight,
+  height,
+  age,
+  sex,
+}) {
   const data = {
-    userId,
-    password,
-    nickname,
+    ...(email && { email }),
+    ...(password && { password }),
+    ...(name && { name }),
+    ...(nickname && { nickname }),
+    ...(weight && { weight }),
+    ...(height && { height }),
+    ...(age && { age }),
+    ...(sex && { sex }),
   };
   return this.getMethod("post", {
     url: `${endpoint.users}`,

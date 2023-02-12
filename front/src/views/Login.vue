@@ -48,6 +48,11 @@ export default {
       this.dialog = true;
     },
   },
+  created() {
+    if (this.$route?.params?.isRegister) {
+      this.dialog = true;
+    }
+  },
 };
 </script>
 

@@ -11,16 +11,16 @@
         <h2 class="text-h2-bold text-center">회원 가입</h2>
         <v-icon @click="closeDialog">mdi-close-thick</v-icon>
       </div>
-      <template v-if="tap === 'user'">
+      <template v-if="tab === 'user'">
         <p-input label="아이디" v-model="userId" />
         <p-input label="비밀번호" v-model="password" />
         <p-input label="이름" v-model="name" />
         <p-input label="닉네임" v-model="nickname" />
       </template>
-      <template v-else-if="tap === 'info'">
-        <p-input label="키" v-model="userId" />
-        <p-input label="몸무게" v-model="password" />
-        <p-input label="나이" v-model="name" />
+      <template v-else-if="tab === 'info'">
+        <p-input label="키" v-model="height" suffix="cm" />
+        <p-input label="몸무게" v-model="weight" suffix="kg" />
+        <p-input label="나이 (만)" v-model="age" suffix="세" />
         <div class="d-flex-column w-full mb-2">
           <span class="text-label mb-4">성별</span>
           <v-radio-group v-model="sex" class="ma-0 pa-0">
@@ -40,18 +40,21 @@
       <div class="d-flex justify-end mt-5">
         <p-btn
           theme="grayLine"
-          v-if="tap !== 'user'"
+          v-if="tab !== 'user'"
           class="mr-3"
           @click="prevBtn"
           >이전</p-btn
         >
-        <p-btn theme="secondary" @click="nextBtn">{{ registerText }}</p-btn>
+        <p-btn theme="secondary" @click="nextBtn" :disabled="nextBtnDisabled">{{
+          registerText
+        }}</p-btn>
       </div>
     </div>
   </v-dialog>
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "RegisterDialog",
   props: {
@@ -66,41 +69,88 @@ export default {
       password: "",
       name: "",
       nickname: "",
-      tap: "user",
+      tab: "user",
       sex: "",
+      height: "",
+      weight: "",
+      age: "",
+      loading: false,
     };
   },
   computed: {
     registerText() {
-      return this.tap === "etc" ? "회원가입" : "다음";
+      return this.tab === "etc" ? "회원가입" : "다음";
+    },
+    nextBtnDisabled() {
+      if (this.tab === "user") {
+        if (
+          this.userId === "" ||
+          this.password === "" ||
+          this.name === "" ||
+          this.nickname === ""
+        ) {
+          return true;
+        }
+      }
+      if (this.tab === "info") {
+        if (
+          this.weight === "" ||
+          this.height === "" ||
+          this.age === "" ||
+          this.sex === ""
+        ) {
+          return true;
+        }
+      }
+      return false;
     },
   },
   methods: {
+    ...mapActions({
+      reqPostUser: "users/reqPostUser",
+    }),
     prevBtn() {
-      switch (this.tap) {
+      switch (this.tab) {
         case "info":
-          this.tap = "user";
+          this.tab = "user";
           break;
         case "etc":
-          this.tap = "info";
+          this.tab = "info";
           break;
       }
     },
     nextBtn() {
-      switch (this.tap) {
+      switch (this.tab) {
         case "user":
-          this.tap = "info";
+          this.tab = "info";
           break;
         case "info":
-          this.tap = "etc";
+          this.tab = "etc";
           break;
         case "etc":
-          // 회원가입
+          this.postUser();
           break;
       }
     },
     closeDialog() {
       this.$emit("close");
+    },
+    async postUser() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = this.reqPostUser({
+        ...(this.email && { email: this.email }),
+        ...(this.password && { password: this.password }),
+        ...(this.name && { name: this.name }),
+        ...(this.nickname && { nickname: this.nickname }),
+        ...(this.weight && { weight: this.weight }),
+        ...(this.height && { height: this.height }),
+        ...(this.age && { age: this.age }),
+        ...(this.sex && { sex: this.sex }),
+      });
+      this.loading = false;
     },
   },
 };
