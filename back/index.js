@@ -4,6 +4,7 @@ const dbConfig = require("./database.js");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const bodyParser = require("body-parser");
 const connection = mysql.createConnection(dbConfig);
 const { v4 } = require("uuid");
 const app = express();
@@ -11,8 +12,18 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan("combined"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.set("port", process.env.PORT || 5000);
+app.use(bodyParser.json());
+
+app.get("/users", (req, res) => {
+  const params = req.query;
+  const userData = `SELECT user.userUuid, email, password, name, nickname, weight, height, age, sex, BMR, purpose, exercise from user LEFT JOIN info ON user.userUuid = info.userUuid where user.userUuid="${params.userUuid}"`;
+
+  connection.query(userData, (err, row) => {
+    if (err) throw err;
+    res.json(row[0]);
+  });
+});
 
 // register - 회원 가입
 /** 
@@ -32,7 +43,6 @@ app.set("port", process.env.PORT || 5000);
 app.post("/users", (req, res) => {
   const uuid = v4();
   const body = req.body;
-  console.log(body);
   const insertUser = `INSERT INTO user (userUuid,email,password,name,nickname) VALUES (?, ?, ?, ?, ?); `;
   const insertInfo = `INSERT INTO info (userUuid,weight,height,age,sex,exercise,BMR,purpose) VALUES (?, ?, ?, ?, ?, ?, ?, ?); `;
   let BMR = 10 * body.weight + 6.25 * body.height - 5 * body.age;
@@ -55,7 +65,7 @@ app.post("/users", (req, res) => {
 
   const userQuery = connection.format(insertUser, user);
   const infoQuery = connection.format(insertInfo, info);
-  console.log(userQuery + infoQuery);
+
   connection.query(userQuery + infoQuery, (err) => {
     if (err) {
       res.send({
@@ -75,10 +85,7 @@ app.get("/users/login", (req, res) => {
   const selectUser = `SELECT userUuid from user where email="${params.email}" and password="${params.password}"`;
   connection.query(selectUser, (err, result) => {
     if (err) throw err;
-
-    console.log(selectUser);
-    console.log(result);
-    res.json({ ...result });
+    res.json(result[0]);
   });
 });
 

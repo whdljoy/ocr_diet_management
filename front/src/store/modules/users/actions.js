@@ -1,14 +1,13 @@
 export default (apiInstance) => ({
-  async reqGetUser(store, payload = {}) {
+  async reqGetUserUuid(store, payload = {}) {
     const { email, password } = payload;
-    const result = await apiInstance.users.getUser({
+    const result = await apiInstance.users.getLogin({
       ...(email && { email }),
       ...(password && { password }),
     });
     if (result.status === 200) {
-      store.commit("setUser", result.data);
+      store.commit("setUserUuid", result.data);
     }
-    console.log(result);
     return result;
   },
   async reqPostUser(store, payload = {}) {
@@ -36,6 +35,19 @@ export default (apiInstance) => ({
       ...(exercise && { exercise }),
       ...(purpose && { purpose }),
     });
+    return result;
+  },
+  async reqGetUser(store, payload = {}) {
+    const { userUuid } = payload;
+    if (!userUuid) {
+      return;
+    }
+    const result = await apiInstance.users.getUser({
+      ...(userUuid && { userUuid }),
+    });
+    if (result.status === 200) {
+      store.commit("setUser", result.data);
+    }
     return result;
   },
 });

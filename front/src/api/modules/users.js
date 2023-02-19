@@ -1,6 +1,6 @@
 import { endpoint } from "@/config";
 
-export async function getUser({ email, password }) {
+export async function getLogin({ email, password }) {
   const params = {
     ...(email && { email }),
     ...(password && { password }),
@@ -38,5 +38,15 @@ export async function postUsers({
   return this.getMethod("post", {
     url: `${endpoint.users}`,
     data,
+  });
+}
+
+export async function getUser({ userUuid }) {
+  const params = {
+    ...(userUuid && { userUuid }),
+  };
+  return this.getMethod("get", {
+    url: `${endpoint.users}`,
+    params,
   });
 }

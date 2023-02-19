@@ -7,7 +7,7 @@
       <p-input v-model="password" label="비밀번호" />
       <div class="btn__container mt-10">
         <p-btn theme="secondary" @click="goToRegister">회원 가입</p-btn>
-        <p-btn @click="reqGetUser"> 로그인</p-btn>
+        <p-btn @click="getLogin"> 로그인</p-btn>
       </div>
     </div>
     <register :dialog="dialog" @close="dialog = false" />
@@ -31,14 +31,14 @@ export default {
   },
   methods: {
     ...mapActions({
-      getUser: "users/reqGetUser",
+      reqGetUserUuid: "users/reqGetUserUuid",
     }),
-    async reqGetUser() {
+    async getLogin() {
       if (this.loading) {
         return;
       }
       this.loading = true;
-      const result = await this.getUser({
+      const result = await this.reqGetUserUuid({
         ...(this.email && { email: this.email }),
         ...(this.password && { password: this.password }),
       });
@@ -48,7 +48,6 @@ export default {
           name: "calendar",
         });
       }
-      console.log(result.data);
     },
     goToRegister() {
       this.dialog = true;

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import Day from "@/components/Day";
 import CalendarHeader from "@/components/CalendarHeader";
 export default {
@@ -38,15 +39,41 @@ export default {
       attributes: [],
       dayDialog: false,
       date: new Date(),
+      loading: false,
     };
   },
+  computed: {
+    ...mapGetters({
+      userUuid: "users/getUserUuid",
+      user: "users/getUser",
+    }),
+  },
   methods: {
+    ...mapActions({
+      reqGetUser: "users/reqGetUser",
+    }),
+
     showDay(day) {
       this.date = day.date;
       console.log(day);
       console.log(this.date);
       this.dayDialog = true;
     },
+    async getUserData() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqGetUser({
+        ...(this.userUuid && { userUuid: this.userUuid }),
+      });
+      console.log(result);
+      console.log(this.user);
+    },
+  },
+  created() {
+    console.log(this.userUuid);
+    this.getUserData();
   },
 };
 </script>

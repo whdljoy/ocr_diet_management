@@ -69,11 +69,14 @@ class ApiClient extends axios.Axios {
     return axiosConfig;
   }
   getMethod(method, { url, params = {}, data = {}, headers }) {
-    console.log(data);
     if (method === "get") {
-      return this.get(url, {
-        params,
-      });
+      return this.get(
+        url,
+        {
+          params,
+        },
+        { headers: headers }
+      );
     } else if (method === "post") {
       return this.post(url, JSON.stringify(data), {
         headers: headers,
