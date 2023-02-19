@@ -3,8 +3,8 @@
     <img src="@/assets/main.png" style="width: 50%" />
     <div class="form__wrapper pl-10">
       <h1 class="text-h1-bold mb-10">로그인</h1>
-      <p-input v-model="userId" label="아이디" class="mb-5" />
-      <p-input v-model="passWord" label="비밀번호" />
+      <p-input v-model="email" label="아이디" class="mb-5" />
+      <p-input v-model="password" label="비밀번호" />
       <div class="btn__container mt-10">
         <p-btn theme="secondary" @click="goToRegister">회원 가입</p-btn>
         <p-btn @click="reqGetUser"> 로그인</p-btn>
@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      userId: "",
-      passWord: "",
+      email: "",
+      password: "",
       dialog: false,
     };
   },
@@ -39,10 +39,16 @@ export default {
       }
       this.loading = true;
       const result = await this.getUser({
-        email: "hgw4846@gmail.com",
+        ...(this.email && { email: this.email }),
+        ...(this.password && { password: this.password }),
       });
       this.loading = false;
-      console.log(result);
+      if (result.status === 200) {
+        this.$router.push({
+          name: "calendar",
+        });
+      }
+      console.log(result.data);
     },
     goToRegister() {
       this.dialog = true;

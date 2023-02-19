@@ -3,4 +3,5 @@ module.exports = {
   user: "root",
   password: "joy1234",
   database: "ocr_dm",
+  multipleStatements: true,
 };

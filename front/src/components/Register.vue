@@ -12,7 +12,7 @@
         <v-icon @click="closeDialog">mdi-close-thick</v-icon>
       </div>
       <template v-if="tab === 'user'">
-        <p-input label="아이디" v-model="userId" />
+        <p-input label="아이디" v-model="email" />
         <p-input label="비밀번호" v-model="password" />
         <p-input label="이름" v-model="name" />
         <p-input label="닉네임" v-model="nickname" />
@@ -32,6 +32,38 @@
             <v-radio value="Female">
               <template v-slot:label>
                 <span class="text-body-2-regular black--text">여성</span>
+              </template>
+            </v-radio>
+          </v-radio-group>
+        </div>
+      </template>
+      <template v-else-if="tab === 'etc'">
+        <div class="d-flex-column w-full mb-2">
+          <span class="text-label mb-4">운동량</span>
+          <v-radio-group v-model="exercise" class="ma-0 pa-0">
+            <v-radio
+              v-for="(exec, idx) in exercise_case"
+              :key="idx"
+              :value="exec.value"
+            >
+              <template v-slot:label>
+                <span class="text-body-2-regular black--text">{{
+                  exec.text
+                }}</span>
+              </template>
+            </v-radio>
+          </v-radio-group>
+          <span class="text-label mb-4">운동 목적</span>
+          <v-radio-group v-model="purpose" class="ma-0 pa-0">
+            <v-radio
+              v-for="(pp, idx) in exercise_purpose"
+              :key="idx"
+              :value="pp.value"
+            >
+              <template v-slot:label>
+                <span class="text-body-2-regular black--text">{{
+                  pp.text
+                }}</span>
               </template>
             </v-radio>
           </v-radio-group>
@@ -65,7 +97,7 @@ export default {
   },
   data() {
     return {
-      userId: "",
+      email: "",
       password: "",
       name: "",
       nickname: "",
@@ -75,6 +107,44 @@ export default {
       weight: "",
       age: "",
       loading: false,
+      exercise: "",
+      exercise_case: [
+        {
+          text: "거의 운동하지 않음",
+          value: 1.2,
+        },
+        {
+          text: "가벼운 운동(주 1~3일)",
+          value: 1.375,
+        },
+        {
+          text: "보통 수준",
+          value: 1.55,
+        },
+        {
+          text: "적극적으로 운동(주 4~5일)",
+          value: 1.725,
+        },
+        {
+          text: "매우 적극적으로 운동(주 6~7일)",
+          value: 1.9,
+        },
+      ],
+      purpose: "",
+      exercise_purpose: [
+        {
+          text: "체중 감량",
+          value: "PLUS",
+        },
+        {
+          text: "체중 유지",
+          value: "CURRENT",
+        },
+        {
+          text: "체중 증가",
+          value: "MINUS",
+        },
+      ],
     };
   },
   computed: {
@@ -84,7 +154,7 @@ export default {
     nextBtnDisabled() {
       if (this.tab === "user") {
         if (
-          this.userId === "" ||
+          this.email === "" ||
           this.password === "" ||
           this.name === "" ||
           this.nickname === ""
@@ -99,6 +169,11 @@ export default {
           this.age === "" ||
           this.sex === ""
         ) {
+          return true;
+        }
+      }
+      if (this.tab === "etc") {
+        if (this.exercise === "" || this.purpose === "") {
           return true;
         }
       }
@@ -149,8 +224,13 @@ export default {
         ...(this.height && { height: this.height }),
         ...(this.age && { age: this.age }),
         ...(this.sex && { sex: this.sex }),
+        ...(this.exercise && { exercise: this.exercise }),
+        ...(this.purpose && { purpose: this.purpose }),
       });
       this.loading = false;
+      if (result.success) {
+        this.$emit("close");
+      }
     },
   },
 };

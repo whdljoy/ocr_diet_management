@@ -1,11 +1,29 @@
 export default (apiInstance) => ({
   async reqGetUser(store, payload = {}) {
-    const { email } = payload;
-    const result = await apiInstance.users.getUserInfo({ email });
+    const { email, password } = payload;
+    const result = await apiInstance.users.getUser({
+      ...(email && { email }),
+      ...(password && { password }),
+    });
+    if (result.status === 200) {
+      store.commit("setUser", result.data);
+    }
+    console.log(result);
+    return result;
   },
   async reqPostUser(store, payload = {}) {
-    const { email, password, name, nickname, weight, height, age, sex } =
-      payload;
+    const {
+      email,
+      password,
+      name,
+      nickname,
+      weight,
+      height,
+      age,
+      sex,
+      exercise,
+      purpose,
+    } = payload;
     const result = await apiInstance.users.postUsers({
       ...(email && { email }),
       ...(password && { password }),
@@ -15,9 +33,9 @@ export default (apiInstance) => ({
       ...(height && { height }),
       ...(age && { age }),
       ...(sex && { sex }),
+      ...(exercise && { exercise }),
+      ...(purpose && { purpose }),
     });
-    if (result.success) {
-      // store.commit("setUser", result.data);
-    }
+    return result;
   },
 });

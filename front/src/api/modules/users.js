@@ -1,11 +1,12 @@
 import { endpoint } from "@/config";
 
-export async function getUserInfo({ email }) {
+export async function getUser({ email, password }) {
   const params = {
-    email,
+    ...(email && { email }),
+    ...(password && { password }),
   };
   return this.getMethod("get", {
-    url: `${endpoint.users}`,
+    url: `${endpoint.users}/login`,
     params,
   });
 }
@@ -19,6 +20,8 @@ export async function postUsers({
   height,
   age,
   sex,
+  exercise,
+  purpose,
 }) {
   const data = {
     ...(email && { email }),
@@ -29,6 +32,8 @@ export async function postUsers({
     ...(height && { height }),
     ...(age && { age }),
     ...(sex && { sex }),
+    ...(exercise && { exercise }),
+    ...(purpose && { purpose }),
   };
   return this.getMethod("post", {
     url: `${endpoint.users}`,
