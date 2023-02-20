@@ -13,13 +13,21 @@
           @click="showDay(day)"
         >
           <span class="day-label text-sm">{{ day.day }}</span>
+          <p class="secondary--text">
+            <span class="black--text text-body-2-bold">섭취량:</span>
+            {{ ocrTotalCalories }} kcal
+          </p>
+          <p class="primary--text">
+            <span class="black--text text-body-2-bold">목표 대사량:</span>
+            {{ activation }} kcal
+          </p>
           <div class="flex-grow overflow-y-auto overflow-x-auto">
             <p v-for="attr in attributes" :key="attr.key"></p>
           </div>
         </div>
       </template>
     </p-calendar>
-    <day :dialog="dayDialog" :date="date" />
+    <day :dialog="dayDialog" :date="date" @close="dayDialog = false" />
   </div>
 </template>
 
@@ -47,16 +55,31 @@ export default {
       userUuid: "users/getUserUuid",
       user: "users/getUser",
     }),
+    activation() {
+      let calories;
+      switch (this.user?.purpose) {
+        case "MINUS":
+          calories = -500;
+          break;
+        case "CURRENT":
+          calories = 0;
+          break;
+        case "PLUS":
+          calories = 500;
+          break;
+      }
+      return parseInt(this.user?.BMR * this.user?.exercise + calories) || 0;
+    },
+    ocrTotalCalories() {
+      return 0;
+    },
   },
   methods: {
     ...mapActions({
       reqGetUser: "users/reqGetUser",
     }),
-
     showDay(day) {
       this.date = day.date;
-      console.log(day);
-      console.log(this.date);
       this.dayDialog = true;
     },
     async getUserData() {
@@ -67,12 +90,9 @@ export default {
       const result = await this.reqGetUser({
         ...(this.userUuid && { userUuid: this.userUuid }),
       });
-      console.log(result);
-      console.log(this.user);
     },
   },
   created() {
-    console.log(this.userUuid);
     this.getUserData();
   },
 };

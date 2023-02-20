@@ -1,7 +1,6 @@
 <template>
   <header class="header__container border-box">
     <div class="header__wrap">
-      <poin-logo class="mr-10" />
       <template>
         <router-link style="all: unset" :to="{ name: 'login' }">
           <button class="campus-register-btn">

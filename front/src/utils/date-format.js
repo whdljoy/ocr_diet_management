@@ -14,7 +14,6 @@ function getDateFormat(
   if (!date) {
     return "";
   }
-  console.log(dateFns);
   let result = dateFns.format(
     subDays ? dateFns.subDays(date, subDays) : dateFns.addDays(date, addDays),
     format,

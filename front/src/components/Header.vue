@@ -1,7 +1,6 @@
 <template>
   <header class="header__container border-box">
     <div class="header__wrap">
-      <poin-logo class="mr-10" />
       <template>
         <button @click="toRegister" class="campus-register-btn">
           {{ text.join }}
