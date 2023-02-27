@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import Register from "@/components/Register";
 export default {
   name: "loginPage",
@@ -28,6 +28,11 @@ export default {
       password: "",
       dialog: false,
     };
+  },
+  computed: {
+    ...mapGetters({
+      userUuid: "users/getUserUuid",
+    }),
   },
   methods: {
     ...mapActions({
@@ -44,6 +49,7 @@ export default {
       });
       this.loading = false;
       if (result.status === 200) {
+        localStorage.setItem("userUuid", this.userUuid);
         this.$router.push({
           name: "calendar",
         });

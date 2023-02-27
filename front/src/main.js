@@ -12,6 +12,8 @@ import PSwitch from "@/components/common/Switch";
 import PTable from "@/components/common/Table";
 import PCheckbox from "@/components/common/Checkbox";
 import Calendar from "v-calendar/lib/components/calendar.umd";
+import axios from "axios";
+Vue.prototype.$axios = axios;
 Vue.config.productionTip = false;
 Vue.component("PBtn", PBtn);
 Vue.component("PInput", PInput);

@@ -1,11 +1,10 @@
 import * as users from "./users";
-import * as calender from "./calender";
-
+import * as calendar from "./calendar";
 export default {
   users: {
     ...users,
   },
-  calender: {
-    ...calender,
+  calendar: {
+    ...calendar,
   },
 };

@@ -1,21 +1,29 @@
 <template>
-  <v-dialog :value="dialog" content-class="white">
+  <v-dialog :value="dialog" content-class="white" :width="1280">
     <div class="px-15 py-15">
       <div class="d-flex mb-5">
         <div class="d-flex w-full justify-center">
-          <h4 class="text-h4-medium">{{ today }}</h4>
+          <h2 class="text-h2-medium">{{ today }}</h2>
         </div>
         <v-icon @click="closeDialog">mdi-close-thick</v-icon>
       </div>
       <div class="nutrients__container">
         <div class="upload">
-          <h4 class="text-center text-h4-bold">오늘의 섭취</h4>
+          <h4 class="text-center text-h4-bold mb-5">오늘의 섭취</h4>
+          <div class="d-flex" style="gap: 12px">
+            <p-btn class="w-full" theme="secondaryLine" @click="ocrUpload"
+              ><v-icon>mdi-plus</v-icon></p-btn
+            >
+            <p-btn class="w-full" theme="secondaryLine" @click="onSearch"
+              ><v-icon>mdi-magnify-plus-outline</v-icon></p-btn
+            >
+          </div>
         </div>
         <div class="nutrients__wrapper">
           <div class="item">
-            <h4 class="text-center text-h4-bold">대사량</h4>
+            <h3 class="text-center text-h3-bold mb-3">대사량</h3>
             <div
-              class="d-flex justify-space-between align-center h-full"
+              class="d-flex justify-space-between align-center"
               style="gap: 12px"
             >
               <div class="item__wrapper">
@@ -28,7 +36,7 @@
             </div>
           </div>
           <div class="item">
-            <h3 class="text-center text-h3-bold">영양성분</h3>
+            <h3 class="text-center text-h3-bold mb-3">영양성분</h3>
             <div class="nutrients">
               <div class="target">
                 <h5 class="mb-5 text-h5-bold">탄수화물 (50%)</h5>
@@ -50,14 +58,27 @@
         </div>
       </div>
     </div>
+    <input
+      type="file"
+      id="ocr_upload"
+      style="display: none"
+      @change="postOcr"
+      accept="image/jpeg, image/png, image/jpg"
+    />
+    <search :dialog="searchDialog" @close="searchDialog = false" />
   </v-dialog>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import Search from "@/components/Search";
+import { mapGetters, mapActions } from "vuex";
 import { dateFormat } from "@/utils";
+import { baseUrl } from "@/config";
 export default {
   name: "DayDialog",
+  components: {
+    Search,
+  },
   props: {
     dialog: {
       type: Boolean,
@@ -67,6 +88,13 @@ export default {
       type: Date,
       default: new Date(),
     },
+  },
+  data() {
+    return {
+      base64: null,
+      searchDialog: false,
+      loading: false,
+    };
   },
   computed: {
     ...mapGetters({
@@ -114,11 +142,48 @@ export default {
     totalCarbohydrate() {
       return 0;
     },
+    convertedBase64() {
+      return this?.base64 || "";
+    },
   },
   watch: {},
   methods: {
+    ...mapActions({
+      reqGetFood: "calendar/reqGetFood",
+    }),
     closeDialog() {
       this.$emit("close");
+    },
+    ocrUpload() {
+      document.getElementById("ocr_upload").click();
+    },
+    async postOcr(e) {
+      if (this.loading) {
+        return;
+      }
+      let form = new FormData();
+      form.append("image", e.target.files[0]);
+      // this.base64 = await this.toBase64(e.target.files[0]);
+      this.loading = true;
+      // const result = await this.reqGetFood({
+      //   ...(this.base64 && { image: this.base64.split(",")[1] }),
+      // });
+      const result = await this.$axios.post(`${baseUrl}/calendar/ocr`, form, {
+        header: { "Content-Type": "multipart/form-data" },
+      });
+      this.loading = false;
+      console.log(result);
+    },
+    toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    },
+    onSearch() {
+      this.searchDialog = true;
     },
   },
   created() {},
@@ -127,6 +192,7 @@ export default {
 
 <style lang="scss" scoped>
 .nutrients__container {
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -146,13 +212,14 @@ export default {
       padding: 40px 40px 40px 40px;
     }
     .item__wrapper {
+      background-color: $white;
       border: 2px solid $gray5;
       border-radius: 4px;
       flex-direction: column;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100%;
+      height: 200px;
       width: 50%;
     }
     .nutrients {
@@ -161,11 +228,12 @@ export default {
       gap: 8px;
       height: 100%;
       .target {
+        background-color: $white;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100%;
+        height: 200px;
         border: 2px solid $gray5;
         border-radius: 4px;
       }

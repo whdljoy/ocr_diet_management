@@ -2,14 +2,9 @@
   <header class="header__container border-box">
     <div class="header__wrap">
       <template>
-        <router-link style="all: unset" :to="{ name: 'login' }">
-          <button class="campus-register-btn">
-            {{ text.join }}
-          </button>
-        </router-link>
-        <button @click="toLogin" class="login-btn">
-          {{ text.logIn }}
-        </button>
+        <p-btn theme="secondary" @click="toLogout">
+          {{ text.logOut }}
+        </p-btn>
       </template>
     </div>
   </header>
@@ -25,8 +20,7 @@ export default {
     return {
       loading: false,
       text: {
-        logIn: "로그인",
-        join: "회원가입",
+        logOut: "로그아웃",
       },
     };
   },
@@ -35,7 +29,7 @@ export default {
     ...mapGetters({}),
   },
   methods: {
-    toLogin() {
+    toLogout() {
       this.$router.push({
         name: "login",
       });
@@ -58,15 +52,15 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 .header__container .header__wrap {
-  max-width: 1240px;
   width: 100%;
-  padding: 0 20px;
+  padding: 0 0;
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 0 auto;
+  margin: 0 240px;
   justify-content: flex-end;
 }
 .header__container .login__wrap {
@@ -80,41 +74,5 @@ export default {
 .header__container .login__wrap span {
   cursor: pointer;
   padding: 0 8px;
-}
-.login-btn {
-  background-color: $white;
-  border: 1.5px solid $gray3;
-  border-radius: 8px;
-  color: $black;
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  margin-left: 8px;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  height: 40px;
-  &:hover {
-    background-color: $primary100;
-    border-color: $primary500;
-    color: $primary800;
-  }
-}
-.campus-register-btn {
-  background-color: $primary;
-  border: 1.5px solid $primary;
-  border-radius: 8px;
-  color: $white;
-  padding: 8px 20px;
-  margin-left: 16px;
-  transition: all 0.3s ease-in-out;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  &:hover {
-    background-color: $primary800;
-    border-color: $primary800;
-  }
 }
 </style>

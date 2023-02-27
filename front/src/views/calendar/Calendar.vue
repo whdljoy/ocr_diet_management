@@ -1,33 +1,35 @@
 <template>
   <div>
     <calendarHeader />
-    <p-calendar
-      class="custom-calendar max-w-full"
-      is-expanded
-      :attributes="attributes"
-      ref="calender"
-    >
-      <template v-slot:day-content="{ day, attributes }">
-        <div
-          class="flex flex-col h-full z-10 overflow-hidden"
-          @click="showDay(day)"
-        >
-          <span class="day-label text-sm">{{ day.day }}</span>
-          <p class="secondary--text">
-            <span class="black--text text-body-2-bold">섭취량:</span>
-            {{ ocrTotalCalories }} kcal
-          </p>
-          <p class="primary--text">
-            <span class="black--text text-body-2-bold">목표 대사량:</span>
-            {{ activation }} kcal
-          </p>
-          <div class="flex-grow overflow-y-auto overflow-x-auto">
-            <p v-for="attr in attributes" :key="attr.key"></p>
+    <div class="calendar__container">
+      <p-calendar
+        class="custom-calendar max-w-full h-full"
+        is-expanded
+        :attributes="attributes"
+        ref="calendar"
+      >
+        <template v-slot:day-content="{ day, attributes }">
+          <div
+            class="flex flex-col h-full z-10 overflow-hidden"
+            @click="showDay(day)"
+          >
+            <span class="day-label text-sm">{{ day.day }}</span>
+            <p class="secondary--text">
+              <span class="black--text text-body-2-bold">섭취량:</span>
+              {{ ocrTotalCalories }} kcal
+            </p>
+            <p class="primary--text">
+              <span class="black--text text-body-2-bold">목표 대사량:</span>
+              {{ activation }} kcal
+            </p>
+            <div class="flex-grow overflow-y-auto overflow-x-auto">
+              <p v-for="attr in attributes" :key="attr.key"></p>
+            </div>
           </div>
-        </div>
-      </template>
-    </p-calendar>
-    <day :dialog="dayDialog" :date="date" @close="dayDialog = false" />
+        </template>
+      </p-calendar>
+      <day :dialog="dayDialog" :date="date" @close="dayDialog = false" />
+    </div>
   </div>
 </template>
 
@@ -73,6 +75,9 @@ export default {
     ocrTotalCalories() {
       return 0;
     },
+    userId() {
+      return this.userUuid || localStorage.getItem("userUuid");
+    },
   },
   methods: {
     ...mapActions({
@@ -88,7 +93,7 @@ export default {
       }
       this.loading = true;
       const result = await this.reqGetUser({
-        ...(this.userUuid && { userUuid: this.userUuid }),
+        ...(this.userId && { userUuid: this.userId }),
       });
     },
   },
@@ -99,6 +104,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.calendar__container {
+  padding: 40px 120px;
+  height: 100%;
+}
 ::-webkit-scrollbar {
   width: 0px;
 }
@@ -110,11 +119,12 @@ export default {
     --day-border: 1px solid #b8c2cc;
     --day-border-highlight: 1px solid #b8c2cc;
     --day-width: 90px;
-    --day-height: 90px;
+    --day-height: 150px;
     --weekday-bg: #f8fafc;
     --weekday-border: 1px solid #eaeaea;
     border-radius: 0;
     width: 100%;
+    height: 100%;
     & .vc-header {
       background-color: #f1f5f8;
       padding: 10px 0;
@@ -131,7 +141,8 @@ export default {
     & .vc-day {
       padding: 0 5px 3px 5px;
       text-align: left;
-      height: var(--day-height);
+      min-height: var(--day-height);
+      // height: 100%;
       min-width: var(--day-width);
       background-color: white;
       &.weekday-1,

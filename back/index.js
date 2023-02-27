@@ -7,13 +7,18 @@ const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const connection = mysql.createConnection(dbConfig);
 const { v4 } = require("uuid");
+const axios = require("axios");
+const multer = require("multer");
+const fs = require("fs");
 const app = express();
+
 app.use(helmet());
 app.use(cors());
 app.use(morgan("combined"));
 app.use(express.json());
 app.set("port", process.env.PORT || 5000);
 app.use(bodyParser.json());
+let upload = multer({ dest: "public/uploads/" });
 
 app.get("/users", (req, res) => {
   const params = req.query;
@@ -87,6 +92,88 @@ app.get("/users/login", (req, res) => {
     if (err) throw err;
     res.json(result[0]);
   });
+});
+
+app.use(express.static("public/uploads"));
+
+function ocr(file) {
+  const timestamp = new Date().getTime();
+  const uuid = v4();
+  const base64 = fs.readFileSync(file.path).toString("base64");
+  axios
+    .post(
+      "https://12jvkdr39x.apigw.ntruss.com/custom/v1/20703/66ede7455e33baa0073a7ded373247895ae2419eb86a5cf3774382a3d305f389/general",
+      {
+        images: [
+          {
+            format: file.mimetype.split("image/")[1],
+            name: file.originalname,
+            data: base64,
+          },
+        ],
+        lang: "ko",
+        requestId: uuid,
+        resultType: "string",
+        timestamp: timestamp,
+        version: "V1",
+        enableTableDetection: true,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-OCR-SECRET": "TFl6c2JqYXZKVWZjcEtyRXZ0TmRFY0JQQnFqZmlTZGI=",
+        },
+      }
+    )
+    .then((res) => {
+      console.log(res);
+
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e.response);
+    });
+}
+
+app.post("/calendar/ocr", upload.single("image"), (req, res) => {
+  const image = req.file;
+  const timestamp = new Date().getTime();
+  const uuid = v4();
+  const base64 = fs.readFileSync(image.path).toString("base64");
+  axios
+    .post(
+      "https://12jvkdr39x.apigw.ntruss.com/custom/v1/20703/66ede7455e33baa0073a7ded373247895ae2419eb86a5cf3774382a3d305f389/general",
+      {
+        images: [
+          {
+            format: image.mimetype.split("image/")[1],
+            name: image.originalname,
+            data: base64,
+          },
+        ],
+        lang: "ko",
+        requestId: uuid,
+        resultType: "string",
+        timestamp: timestamp,
+        version: "V1",
+        enableTableDetection: true,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-OCR-SECRET": "TFl6c2JqYXZKVWZjcEtyRXZ0TmRFY0JQQnFqZmlTZGI=",
+        },
+      }
+    )
+    .then((result) => {
+      console.log(result.data);
+      if (result.status === 200) {
+        res.json(result.data.images[0].fields);
+      }
+    })
+    .catch((e) => {
+      console.log(e.response);
+    });
 });
 
 app.listen(app.get("port"), () => {
