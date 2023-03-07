@@ -1,1 +1,6 @@
-export default {};
+export default {
+  monthCalories: [],
+  ocrData: [],
+  ocrTable: [],
+  dayDiet: [],
+};

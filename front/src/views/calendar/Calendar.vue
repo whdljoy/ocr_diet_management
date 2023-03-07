@@ -7,16 +7,18 @@
         is-expanded
         :attributes="attributes"
         ref="calendar"
+        @update:to-page="currentCalendar"
       >
         <template v-slot:day-content="{ day, attributes }">
           <div
             class="flex flex-col h-full z-10 overflow-hidden"
+            :class="{ today: checkToday(day.day) }"
             @click="showDay(day)"
           >
             <span class="day-label text-sm">{{ day.day }}</span>
             <p class="secondary--text">
               <span class="black--text text-body-2-bold">섭취량:</span>
-              {{ ocrTotalCalories }} kcal
+              {{ ocrTotalCalories(day.day) }} kcal
             </p>
             <p class="primary--text">
               <span class="black--text text-body-2-bold">목표 대사량:</span>
@@ -36,6 +38,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import Day from "@/components/Day";
+import { dateFormat } from "@/utils";
 import CalendarHeader from "@/components/CalendarHeader";
 export default {
   name: "CalendarPage",
@@ -50,12 +53,16 @@ export default {
       dayDialog: false,
       date: new Date(),
       loading: false,
+      today: new Date(),
+      calendarDate: "",
+      first: true,
     };
   },
   computed: {
     ...mapGetters({
       userUuid: "users/getUserUuid",
       user: "users/getUser",
+      monthCalories: "calendar/getMonthCalories",
     }),
     activation() {
       let calories;
@@ -72,17 +79,37 @@ export default {
       }
       return parseInt(this.user?.BMR * this.user?.exercise + calories) || 0;
     },
-    ocrTotalCalories() {
-      return 0;
-    },
     userId() {
       return this.userUuid || localStorage.getItem("userUuid");
+    },
+    getCalendarDate() {
+      return dateFormat.getDateFormat(this.calendarDate, "yyyy-MM");
+    },
+    getToday() {
+      return this.today.getDate();
     },
   },
   methods: {
     ...mapActions({
       reqGetUser: "users/reqGetUser",
+      reqGetCalories: "calendar/reqGetCalories",
     }),
+    ocrTotalCalories(day) {
+      const eachDay = this?.monthCalories.filter((item) => {
+        return item.day === day;
+      });
+      return eachDay[0]?.calories || 0;
+    },
+    checkToday(day) {
+      if (
+        this.getCalendarDate ===
+          dateFormat.getDateFormat(new Date(), "yyyy-MM") &&
+        this.getToday === day
+      ) {
+        return true;
+      }
+      return false;
+    },
     showDay(day) {
       this.date = day.date;
       this.dayDialog = true;
@@ -95,10 +122,33 @@ export default {
       const result = await this.reqGetUser({
         ...(this.userId && { userUuid: this.userId }),
       });
+      this.loading = false;
+    },
+    currentCalendar(page) {
+      this.calendarDate = new Date(page.year + "-" + page.month);
+      if (!this.first) {
+        this.getCalories();
+      }
+      return;
+    },
+    async getCalories() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqGetCalories({
+        ...(this.userId && { userUuid: this.userId }),
+        ...(this.getCalendarDate && { searchDate: this.getCalendarDate }),
+      });
+      this.loading = false;
+      if (this.first) {
+        this.first = false;
+      }
     },
   },
-  created() {
-    this.getUserData();
+  async created() {
+    await this.getUserData();
+    this.getCalories();
   },
 };
 </script>
@@ -136,7 +186,7 @@ export default {
       background-color: var(--weekday-bg);
       border-bottom: var(--weekday-border);
       border-top: var(--weekday-border);
-      padding: 5px 0;
+      // padding: 5px 0;
     }
     & .vc-day {
       padding: 0 5px 3px 5px;
@@ -162,6 +212,9 @@ export default {
     & .vc-day-dots {
       margin-bottom: 5px;
     }
+  }
+  .today {
+    background-color: #f5f7cf;
   }
 }
 </style>

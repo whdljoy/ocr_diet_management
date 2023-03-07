@@ -30,21 +30,6 @@ app.get("/users", (req, res) => {
   });
 });
 
-// register - 회원 가입
-/** 
- *email,
-  password,
-  name,
-  nickname,
-  weight,
-  height,
-  age,
-  sex,
-  기초 대사량 계산 : (10 × 몸무게) + (6.25 × 키) – (5 × 나이)
-  --남성: 기본식 ＋ 5
-  --여성: 기본식 － 161
-
- */
 app.post("/users", (req, res) => {
   const uuid = v4();
   const body = req.body;
@@ -94,46 +79,14 @@ app.get("/users/login", (req, res) => {
   });
 });
 
-app.use(express.static("public/uploads"));
-
-function ocr(file) {
-  const timestamp = new Date().getTime();
-  const uuid = v4();
-  const base64 = fs.readFileSync(file.path).toString("base64");
-  axios
-    .post(
-      "https://12jvkdr39x.apigw.ntruss.com/custom/v1/20703/66ede7455e33baa0073a7ded373247895ae2419eb86a5cf3774382a3d305f389/general",
-      {
-        images: [
-          {
-            format: file.mimetype.split("image/")[1],
-            name: file.originalname,
-            data: base64,
-          },
-        ],
-        lang: "ko",
-        requestId: uuid,
-        resultType: "string",
-        timestamp: timestamp,
-        version: "V1",
-        enableTableDetection: true,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-OCR-SECRET": "TFl6c2JqYXZKVWZjcEtyRXZ0TmRFY0JQQnFqZmlTZGI=",
-        },
-      }
-    )
-    .then((res) => {
-      console.log(res);
-
-      return res.data;
-    })
-    .catch((e) => {
-      console.log(e.response);
-    });
-}
+app.get("/calendar/calories", (req, res) => {
+  const params = req.query;
+  const getCalories = `SELECT fat,carbohydrate,protein,calories, Day(date) as day from calories where userUuid="${params.userUuid}" and DATE_FORMAT(date, '%Y-%m')="${params.searchDate}"`;
+  connection.query(getCalories, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
 
 app.post("/calendar/ocr", upload.single("image"), (req, res) => {
   const image = req.file;
@@ -155,7 +108,7 @@ app.post("/calendar/ocr", upload.single("image"), (req, res) => {
         requestId: uuid,
         resultType: "string",
         timestamp: timestamp,
-        version: "V1",
+        version: "V2",
         enableTableDetection: true,
       },
       {
@@ -166,9 +119,9 @@ app.post("/calendar/ocr", upload.single("image"), (req, res) => {
       }
     )
     .then((result) => {
-      console.log(result.data);
+      console.log(result.data.images[0]);
       if (result.status === 200) {
-        res.json(result.data.images[0].fields);
+        res.json(result.data.images[0]);
       }
     })
     .catch((e) => {
@@ -176,6 +129,68 @@ app.post("/calendar/ocr", upload.single("image"), (req, res) => {
     });
 });
 
+app.post("/calendar/diet", (req, res) => {
+  const body = req.body;
+  const uuid = v4();
+  const insertDiet = `INSERT INTO diet (dietUuid, userUuid,productName,carbohydrate,protein,fat,eachCalories,servingWT,date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?); `;
+  let diet = [
+    uuid,
+    body.userUuid,
+    body.productName,
+    body.carbohydrate,
+    body.protein,
+    body.fat,
+    body.eachCalories,
+    body.servingWT,
+    body.date,
+  ];
+  const dietQuery = connection.format(insertDiet, diet);
+
+  const notExistQuery = `INSERT INTO calories (date, calories, userUuid,fat,carbohydrate,protein) SELECT "${body.date}", ${body.eachCalories}, "${body.userUuid}", ${body.fat}, ${body.carbohydrate}, ${body.protein} WHERE NOT EXISTS ( SELECT userUuid FROM calories WHERE userUuid="${body.userUuid}" and date="${body.date}"); `;
+  const existQuery = `UPDATE calories SET carbohydrate = carbohydrate + ${body.carbohydrate}, protein = protein + ${body.protein}, fat= fat + ${body.fat}, calories = calories + ${body.eachCalories} WHERE EXISTS (SELECT exist.userUuid FROM ( SELECT userUuid FROM calories WHERE userUuid="${body.userUuid}" and date="${body.date}") as exist) and userUuid="${body.userUuid}" and date="${body.date}" ; `;
+  connection.query(dietQuery + notExistQuery + existQuery, (err) => {
+    if (err) {
+      res.send({
+        msg: "예기치 않은 오류가 발생하였습니다.",
+      });
+      throw err;
+    } else {
+      return res.json({
+        success: true,
+      });
+    }
+  });
+});
+
+app.get("/calendar/diet", (req, res) => {
+  const params = req.query;
+  const selectDiet = `SELECT * from diet where userUuid="${params.userUuid}" and date="${params.date}"`;
+  connection.query(selectDiet, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+app.put("/calendar/diet", (req, res) => {
+  const body = req.body;
+  const putDiet = `UPDATE diet SET count=${body.count} where dietUuid="${body.dietUuid}";`;
+  const updateQuery = `UPDATE calories, (SELECT * FROM diet where dietUuid="${body.dietUuid}") as Target SET calories.carbohydrate = calories.carbohydrate +((${body.count} - Target.count) * Target.carbohydrate), calories.protein = calories.protein + ((${body.count} - Target.count) * Target.protein), calories.fat= calories.fat + ((${body.count} - Target.count)*Target.fat), calories.calories = calories.calories + ((${body.count} - Target.count)*Target.eachCalories) WHERE calories.userUuid=Target.userUuid and calories.date=Target.date; `;
+
+  connection.query(updateQuery + putDiet, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+app.delete("/calendar/diet/:userUuid/:dietUuid", (req, res) => {
+  const updateQuery = `UPDATE calories, (SELECT * FROM diet where userUuid="${req.params.userUuid}" and dietUuid="${req.params.dietUuid}") as Target SET calories.carbohydrate = calories.carbohydrate - (Target.carbohydrate * Target.count), calories.protein = calories.protein - (Target.protein* Target.count), calories.fat= calories.fat - (Target.fat* Target.count), calories.calories = calories.calories - (Target.eachCalories* Target.count) WHERE calories.userUuid="${req.params.userUuid}" and calories.date=Target.date; `;
+
+  const deleteDiet = `DELETE from diet where userUuid="${req.params.userUuid}" and dietUuid="${req.params.dietUuid}"`;
+  connection.query(updateQuery + deleteDiet, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
 app.listen(app.get("port"), () => {
   console.log("Express server listening on port " + app.get("port"));
 });

@@ -26,8 +26,15 @@
         :items="searchedFood"
         :loading="loading"
         empty-msg="검색된 식품이 없습니다."
-        grid-template-columns="48px minmax(240px,1fr) 120px 80px 80px 80px 120px"
-      ></p-table>
+        grid-template-columns="48px minmax(240px,1fr) 120px 80px  120px 120px"
+      >
+        <template v-slot:selected="{ item }">
+          <p-btn small theme="grayLine" @click="selectFood(item)">선택</p-btn>
+        </template>
+        <template v-slot:serving="{ item }">
+          <p>{{ item.serving }} g</p>
+        </template>
+      </p-table>
     </div>
   </v-dialog>
 </template>
@@ -66,16 +73,12 @@ export default {
           value: "begin",
         },
         {
-          text: "수량",
-          value: "count",
+          text: "1회 제공량",
+          value: "servingWT",
         },
         {
           text: "선택",
           value: "selected",
-        },
-        {
-          text: "1회 제공량",
-          value: "serving",
         },
       ],
     };
@@ -98,16 +101,17 @@ export default {
       return this.food?.map((e, index) => {
         return {
           index: index + 1,
-          production: e.ANIMAL_PLANT,
+          production: e.ANIMAL_PLANT || "-",
           productName: e.DESC_KOR,
           begin: e.BGN_YEAR,
-          serving: e.SERVING_WT,
-          kcal: e.NUTR_CONT1,
-          cb: e.NUTR_CONT2,
+          servingWT: e.SERVING_WT,
+          eachCalories: e.NUTR_CONT1,
+          carbohydrate: e.NUTR_CONT2,
           protein: e.NUTR_CONT3,
           fat: e.NUTR_CONT4,
           sugar: e.NUTR_CONT5,
           salt: e.NUTR_CONT6,
+          count: 1,
         };
       });
     },
@@ -117,6 +121,9 @@ export default {
       reqSetFood: "external/setFood",
       reqClearFood: "external/clearFood",
     }),
+    selectFood(item) {
+      this.$emit("select", item);
+    },
     closeDialog() {
       this.$emit("close");
     },
@@ -132,10 +139,7 @@ export default {
         `${foodUrl}?ServiceKey=${ServiceKey}&type=json&desc_kor=${this.search}&numOfRows=10`
       );
       this.loading = false;
-      console.log(result);
-      console.log(result.data.body?.items);
       this.reqSetFood(result?.data.body?.items);
-      console.log(this.food);
     },
   },
 };

@@ -82,13 +82,13 @@ class ApiClient extends axios.Axios {
         headers: headers,
       });
     } else if (method === "put") {
-      return this.put(url, data, {
+      return this.put(url, JSON.stringify(data), {
         headers: headers,
       });
     } else if (method === "delete") {
       return this.delete(
         url,
-        { data },
+        { ...data },
         {
           headers: headers,
         }

@@ -1,14 +1,16 @@
 <template>
   <v-dialog :value="dialog" content-class="white" :width="1280">
     <div class="px-15 py-15">
-      <div class="d-flex mb-5">
-        <div class="d-flex w-full justify-center">
-          <h2 class="text-h2-medium">{{ today }}</h2>
+      <div class="d-flex flex-column">
+        <div class="d-flex mb-5">
+          <div class="d-flex w-full justify-center">
+            <h2 class="text-h2-medium">{{ today }}</h2>
+          </div>
+          <v-icon @click="closeDialog">mdi-close-thick</v-icon>
         </div>
-        <v-icon @click="closeDialog">mdi-close-thick</v-icon>
       </div>
       <div class="nutrients__container">
-        <div class="upload">
+        <div class="upload d-flex flex-column">
           <h4 class="text-center text-h4-bold mb-5">오늘의 섭취</h4>
           <div class="d-flex" style="gap: 12px">
             <p-btn class="w-full" theme="secondaryLine" @click="ocrUpload"
@@ -17,6 +19,38 @@
             <p-btn class="w-full" theme="secondaryLine" @click="onSearch"
               ><v-icon>mdi-magnify-plus-outline</v-icon></p-btn
             >
+          </div>
+          <div class="mt-1 d-flex flex-column justify-center">
+            <p-table
+              :headers="headers"
+              :items="dayDiet"
+              grid-template-columns="minmax(100px,1fr) 80px 60px 60px 120px"
+            >
+              <template v-slot:servingWT="{ item }">
+                <p>{{ item.servingWT }} g</p>
+              </template>
+              <template v-slot:count="{ item }">
+                <p v-if="!item.setting">{{ item.count }}</p>
+                <p-input v-else type="number" v-model="item.count" dense />
+              </template>
+              <template v-slot:change="{ item }">
+                <div class="d-flex" style="gap: 4px">
+                  <p-btn
+                    small
+                    theme="secondary"
+                    v-if="!item.setting"
+                    @click="item.setting = true"
+                    >수정</p-btn
+                  >
+                  <p-btn small theme="primary" v-else @click="putDiet(item)"
+                    >저장</p-btn
+                  >
+                  <p-btn small theme="grayLine" @click="deleteDiet(item)"
+                    >삭제</p-btn
+                  >
+                </div>
+              </template>
+            </p-table>
           </div>
         </div>
         <div class="nutrients__wrapper">
@@ -65,13 +99,17 @@
       @change="postOcr"
       accept="image/jpeg, image/png, image/jpg"
     />
-    <search :dialog="searchDialog" @close="searchDialog = false" />
+    <search
+      :dialog="searchDialog"
+      @close="searchDialog = false"
+      @select="setSearchFood"
+    />
   </v-dialog>
 </template>
 
 <script>
 import Search from "@/components/Search";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import { dateFormat } from "@/utils";
 import { baseUrl } from "@/config";
 export default {
@@ -91,17 +129,48 @@ export default {
   },
   data() {
     return {
-      base64: null,
+      postCount: false,
       searchDialog: false,
       loading: false,
+      headers: [
+        {
+          text: "제품명",
+          value: "productName",
+        },
+        {
+          text: "1회 제공량",
+          value: "servingWT",
+        },
+        {
+          text: "칼로리",
+          value: "eachCalories",
+        },
+        {
+          text: "수량",
+          value: "count",
+        },
+        {
+          text: "",
+          value: "change",
+        },
+      ],
+      selectedFoods: {},
+      savedFoods: [],
     };
   },
   computed: {
     ...mapGetters({
       user: "users/getUser",
+      monthCalories: "calendar/getMonthCalories",
+      ocrData: "calendar/getOcrData",
+      userUuid: "users/getUserUuid",
+      dayDiet: "calendar/getDayDiet",
     }),
     today() {
       return dateFormat.getDateFormat(this.date, "yyyy년 MM월 dd일");
+    },
+    userId() {
+      return this.userUuid || localStorage.getItem("userUuid");
     },
     foundation() {
       return parseInt(this.user?.BMR) || 0;
@@ -131,31 +200,117 @@ export default {
       return parseInt(this?.activation * 0.2) || 0;
     },
     totalCalories() {
-      return 0;
+      const eachDay = this?.monthCalories.filter((item) => {
+        return item.day === this.date.getDate();
+      });
+      return eachDay[0]?.calories || 0;
     },
     totalFat() {
-      return 0;
+      const eachDay = this?.monthCalories.filter((item) => {
+        return item.day === this.date.getDate();
+      });
+      return eachDay[0]?.fat || 0;
     },
     totalProtein() {
-      return 0;
+      const eachDay = this?.monthCalories.filter((item) => {
+        return item.day === this.date.getDate();
+      });
+      return eachDay[0]?.protein || 0;
     },
     totalCarbohydrate() {
-      return 0;
-    },
-    convertedBase64() {
-      return this?.base64 || "";
+      const eachDay = this?.monthCalories.filter((item) => {
+        return item.day === this.date.getDate();
+      });
+      return eachDay[0]?.carbohydrate || 0;
     },
   },
-  watch: {},
+  watch: {
+    dialog: {
+      handler(newVal) {
+        if (newVal) {
+          this.getDiet();
+        }
+      },
+    },
+  },
   methods: {
     ...mapActions({
       reqGetFood: "calendar/reqGetFood",
+      reqPostDiet: "calendar/reqPostDiet",
+      reqGetDiet: "calendar/reqGetDiet",
+      reqDeleteDiet: "calendar/reqDeleteDiet",
+      reqPutDiet: "calendar/reqPutDiet",
     }),
+    ...mapMutations({
+      setOcrData: "calendar/setOcrData",
+    }),
+    async setSearchFood(item) {
+      this.searchDialog = false;
+      this.selectedFoods = item;
+      await this.postDiet();
+      this.getDiet();
+    },
     closeDialog() {
       this.$emit("close");
     },
     ocrUpload() {
       document.getElementById("ocr_upload").click();
+    },
+    async putDiet(item) {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqPutDiet({
+        ...(item.dietUuid && { dietUuid: item.dietUuid }),
+        ...(item.count && { count: item.count }),
+      });
+      this.loading = false;
+      if (result) {
+        this.postCount = false;
+        this.getDiet();
+      }
+    },
+    async deleteDiet(item) {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqDeleteDiet({
+        ...(this.userId && { userUuid: this.userId }),
+        ...(item.dietUuid && { dietUuid: item.dietUuid }),
+      });
+      this.loading = false;
+      if (result) {
+        this.getDiet();
+      }
+    },
+    async postDiet() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqPostDiet({
+        ...(this.userId && { userUuid: this.userId }),
+        ...(this.selectedFoods.productName && {
+          productName: this.selectedFoods.productName,
+        }),
+        ...(this.selectedFoods.carbohydrate && {
+          carbohydrate: this.selectedFoods.carbohydrate,
+        }),
+        ...(this.selectedFoods.protein && {
+          protein: this.selectedFoods.protein,
+        }),
+        ...(this.selectedFoods.fat && { fat: this.selectedFoods.fat }),
+        ...(this.selectedFoods.eachCalories && {
+          eachCalories: this.selectedFoods.eachCalories,
+        }),
+        ...(this.selectedFoods.servingWT && {
+          servingWT: this.selectedFoods.servingWT,
+        }),
+        date: dateFormat.getDateFormat(this.date, "yyyy-MM-dd"),
+      });
+      this.loading = false;
     },
     async postOcr(e) {
       if (this.loading) {
@@ -163,27 +318,27 @@ export default {
       }
       let form = new FormData();
       form.append("image", e.target.files[0]);
-      // this.base64 = await this.toBase64(e.target.files[0]);
       this.loading = true;
-      // const result = await this.reqGetFood({
-      //   ...(this.base64 && { image: this.base64.split(",")[1] }),
-      // });
       const result = await this.$axios.post(`${baseUrl}/calendar/ocr`, form, {
         header: { "Content-Type": "multipart/form-data" },
       });
       this.loading = false;
-      console.log(result);
-    },
-    toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      });
+      this.setOcrData(result.data);
+      console.log(result.data);
     },
     onSearch() {
       this.searchDialog = true;
+    },
+    async getDiet() {
+      if (this.loading) {
+        return;
+      }
+      this.loading = true;
+      const result = await this.reqGetDiet({
+        ...(this.userId && { userUuid: this.userId }),
+        date: dateFormat.getDateFormat(this.date, "yyyy-MM-dd"),
+      });
+      this.loading = false;
     },
   },
   created() {},
