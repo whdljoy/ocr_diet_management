@@ -148,7 +148,7 @@ app.post("/calendar/diet", (req, res) => {
 
   const notExistQuery = `INSERT INTO calories (date, calories, userUuid,fat,carbohydrate,protein) SELECT "${body.date}", ${body.eachCalories}, "${body.userUuid}", ${body.fat}, ${body.carbohydrate}, ${body.protein} WHERE NOT EXISTS ( SELECT userUuid FROM calories WHERE userUuid="${body.userUuid}" and date="${body.date}"); `;
   const existQuery = `UPDATE calories SET carbohydrate = carbohydrate + ${body.carbohydrate}, protein = protein + ${body.protein}, fat= fat + ${body.fat}, calories = calories + ${body.eachCalories} WHERE EXISTS (SELECT exist.userUuid FROM ( SELECT userUuid FROM calories WHERE userUuid="${body.userUuid}" and date="${body.date}") as exist) and userUuid="${body.userUuid}" and date="${body.date}" ; `;
-  connection.query(dietQuery + notExistQuery + existQuery, (err) => {
+  connection.query(dietQuery + existQuery + notExistQuery, (err) => {
     if (err) {
       res.send({
         msg: "예기치 않은 오류가 발생하였습니다.",

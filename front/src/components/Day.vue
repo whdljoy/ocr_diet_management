@@ -132,6 +132,7 @@ export default {
       postCount: false,
       searchDialog: false,
       loading: false,
+      pending: false,
       headers: [
         {
           text: "제품명",
@@ -240,6 +241,7 @@ export default {
       reqGetDiet: "calendar/reqGetDiet",
       reqDeleteDiet: "calendar/reqDeleteDiet",
       reqPutDiet: "calendar/reqPutDiet",
+      reqGetCalories: "calendar/reqGetCalories",
     }),
     ...mapMutations({
       setOcrData: "calendar/setOcrData",
@@ -249,6 +251,7 @@ export default {
       this.selectedFoods = item;
       await this.postDiet();
       this.getDiet();
+      this.getCalories();
     },
     closeDialog() {
       this.$emit("close");
@@ -269,6 +272,7 @@ export default {
       if (result) {
         this.postCount = false;
         this.getDiet();
+        this.getCalories();
       }
     },
     async deleteDiet(item) {
@@ -283,6 +287,7 @@ export default {
       this.loading = false;
       if (result) {
         this.getDiet();
+        this.getCalories();
       }
     },
     async postDiet() {
@@ -339,6 +344,19 @@ export default {
         date: dateFormat.getDateFormat(this.date, "yyyy-MM-dd"),
       });
       this.loading = false;
+    },
+    async getCalories() {
+      if (this.pending) {
+        return;
+      }
+      this.pending = true;
+      const result = await this.reqGetCalories({
+        ...(this.userId && { userUuid: this.userId }),
+        ...(this.date && {
+          searchDate: dateFormat.getDateFormat(this.date, "yyyy-MM"),
+        }),
+      });
+      this.pending = false;
     },
   },
   created() {},
