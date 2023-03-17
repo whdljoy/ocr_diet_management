@@ -7,7 +7,7 @@
           일정관리와 식단관리를 <br />
           한번에
         </p>
-        <p-btn @click.stop="goToRegister" theme="secondary" class="mt-5 px-5">
+        <p-btn @click="goToRegister" theme="secondary" class="mt-5 px-5">
           시작하기
         </p-btn>
       </div>
@@ -30,7 +30,12 @@
           :key="index"
           :class="item.reverse ? 'flex-lg-row-reverse' : 'flex-lg-row'"
         >
-          <img class="image__wrapper" :src="item.image" />
+          <img
+            class="image__wrapper"
+            src="@/assets/explain1.png"
+            v-if="item.image"
+          />
+          <img class="image__wrapper" src="@/assets/explain2.png" v-else />
           <div
             class="text__wrapper d-flex flex-column align-center align-lg-start justify-lg-center px-lg-15 px-0"
           >
@@ -100,8 +105,7 @@ export default {
           items: [
             {
               subtitle: `당신의 활동대사량을 확인하고 목적에 맞게 운동량을 조절하세요`,
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_build_1.png",
+              image: true,
               reverse: true,
               isList: true,
               lists: [
@@ -120,8 +124,7 @@ export default {
             },
             {
               subtitle: `편리한 기록으로 일정과 건강 모두 챙기세요`,
-              image:
-                "https://file.poincampus.com/assets/poin-home/feature/img_build_2-1.png",
+              image: false,
               isList: true,
               reverse: false,
               lists: [
