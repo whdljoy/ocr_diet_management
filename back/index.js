@@ -173,7 +173,7 @@ app.get("/calendar/diet", (req, res) => {
 
 app.put("/calendar/diet", (req, res) => {
   const body = req.body;
-  const putDiet = `UPDATE diet SET count=${body.count} where dietUuid="${body.dietUuid}";`;
+  const putDiet = `UPDATE diet SET count=${body.count}, productName="${body.productName}" where dietUuid="${body.dietUuid}";`;
   const updateQuery = `UPDATE calories, (SELECT * FROM diet where dietUuid="${body.dietUuid}") as Target SET calories.carbohydrate = calories.carbohydrate +((${body.count} - Target.count) * Target.carbohydrate), calories.protein = calories.protein + ((${body.count} - Target.count) * Target.protein), calories.fat= calories.fat + ((${body.count} - Target.count)*Target.fat), calories.calories = calories.calories + ((${body.count} - Target.count)*Target.eachCalories) WHERE calories.userUuid=Target.userUuid and calories.date=Target.date; `;
 
   connection.query(updateQuery + putDiet, (err, result) => {

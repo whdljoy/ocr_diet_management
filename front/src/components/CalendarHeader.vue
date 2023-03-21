@@ -2,6 +2,11 @@
   <header class="header__container border-box">
     <div class="header__wrap">
       <template>
+        <p
+          class="mr-10 text-body-1-bold nickname__wrapper rounded-lg px-4 py-2"
+        >
+          <v-icon>mdi-account</v-icon> {{ nickname }}
+        </p>
         <p-btn theme="secondary" @click="toLogout">
           {{ text.logOut }}
         </p-btn>
@@ -26,7 +31,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters({}),
+    ...mapGetters({ user: "users/getUser" }),
+    nickname() {
+      return this.user?.nickname || "-";
+    },
   },
   methods: {
     toLogout() {
@@ -53,6 +61,10 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+.nickname__wrapper {
+  box-shadow: 0 1px 0 0 $gray3;
+  border: 1px solid $gray5;
 }
 .header__container .header__wrap {
   width: 100%;

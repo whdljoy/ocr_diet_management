@@ -48,10 +48,11 @@ export async function getDiet({ userUuid, date }) {
   });
 }
 
-export async function putDiet({ dietUuid, count }) {
+export async function putDiet({ dietUuid, count, productName }) {
   const data = {
     ...(dietUuid && { dietUuid }),
     ...(count && { count }),
+    ...(productName && { productName }),
   };
   return this.getMethod("put", {
     url: `${endpoint.calendar}/diet`,

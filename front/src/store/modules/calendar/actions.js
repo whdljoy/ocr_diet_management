@@ -45,10 +45,11 @@ export default (apiInstance) => ({
     return result;
   },
   async reqPutDiet(store, payload = {}) {
-    const { dietUuid, count } = payload;
+    const { dietUuid, count, productName } = payload;
     const result = await apiInstance.calendar.putDiet({
       ...(dietUuid && { dietUuid }),
       ...(count && { count }),
+      ...(productName && { productName }),
     });
     return result;
   },

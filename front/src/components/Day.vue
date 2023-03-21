@@ -26,6 +26,10 @@
               :items="dayDiet"
               grid-template-columns="minmax(100px,1fr) 80px 60px 60px 120px"
             >
+              <template v-slot:productName="{ item }">
+                <p v-if="!item.setting">{{ item.productName }}</p>
+                <p-input v-else type="text" v-model="item.productName" dense />
+              </template>
               <template v-slot:servingWT="{ item }">
                 <p>{{ item.servingWT }} g</p>
               </template>
@@ -129,6 +133,12 @@ export default {
   },
   data() {
     return {
+      ocrProtein: 0,
+      ocrFat: 0,
+      ocrCarbohydrate: 0,
+      ocrCalories: 0,
+      ocrServingWT: 0,
+      ocrProduct: "",
       postCount: false,
       searchDialog: false,
       loading: false,
@@ -267,6 +277,7 @@ export default {
       const result = await this.reqPutDiet({
         ...(item.dietUuid && { dietUuid: item.dietUuid }),
         ...(item.count && { count: item.count }),
+        ...(item.productName && { productName: item.productName }),
       });
       this.loading = false;
       if (result) {
@@ -317,6 +328,34 @@ export default {
       });
       this.loading = false;
     },
+    async ocrPostDiet() {
+      if (this.loading) {
+        return;
+      }
+
+      this.loading = true;
+      const result = await this.reqPostDiet({
+        ...(this.userId && { userUuid: this.userId }),
+        ...(this.ocrProduct && {
+          productName: this.ocrProduct,
+        }),
+        ...(this.ocrCarbohydrate && {
+          carbohydrate: this.ocrCarbohydrate,
+        }),
+        ...(this.ocrProtein && {
+          protein: this.ocrProtein,
+        }),
+        ...(this.ocrFat && { fat: this.ocrFat }),
+        ...(this.ocrCalories && {
+          eachCalories: this.ocrCalories,
+        }),
+        ...(this.ocrServingWT && {
+          servingWT: this.ocrServingWT,
+        }),
+        date: dateFormat.getDateFormat(this.date, "yyyy-MM-dd"),
+      });
+      this.loading = false;
+    },
     async postOcr(e) {
       if (this.loading) {
         return;
@@ -328,8 +367,94 @@ export default {
         header: { "Content-Type": "multipart/form-data" },
       });
       this.loading = false;
-      this.setOcrData(result.data);
-      console.log(result.data);
+      const raw = result.data.fields.map((item) => {
+        return item.inferText;
+      });
+
+      const table = result.data.tables[result.data.tables.length - 1].cells
+        .map((item) => {
+          return item.cellTextLines[0].cellWords;
+        })
+        .map((item) => {
+          return item.map((txt) => txt.inferText);
+        });
+      console.log(raw);
+      console.log(table);
+
+      const proteinIdx = raw?.findIndex((item) => item.includes("단백질"));
+      if (proteinIdx > -1) {
+        this.ocrProtein = raw[proteinIdx + 1].replace(/[a-zA-Z]/g, "");
+      }
+
+      const fatIdx = raw?.findIndex((item) => item.includes("지방"));
+      if (fatIdx > -1) {
+        this.ocrFat = raw[fatIdx + 1].replace(/[a-zA-Z]/g, "");
+      }
+
+      const carbohydrateIdx = raw.findIndex((item) =>
+        item.includes("탄수화물")
+      );
+      if (carbohydrateIdx > -1) {
+        this.ocrCarbohydrate = raw[carbohydrateIdx + 1].replace(
+          /[a-zA-Z]/g,
+          ""
+        );
+      }
+      const caloriesIdx = raw?.findIndex((item) => item.includes("kcal"));
+      if (carbohydrateIdx > -1) {
+        this.ocrCalories = raw[caloriesIdx - 1].replace(/[a-zA-Z]/g, "");
+      }
+
+      const servingIdx = raw.findIndex((item) => item.includes("mL"));
+      if (servingIdx > -1) {
+        this.ocrServingWT = raw[servingIdx - 1].replace(/[a-zA-Z]/g, "") || 0;
+      }
+
+      const tableProtein = table.filter((item) => {
+        return item?.findIndex((txt) => txt === "단백질") > -1;
+      });
+
+      const tProteinIdx = tableProtein[0].findIndex((item) =>
+        item.includes("단백질")
+      );
+      if (
+        this.ocrProtein !==
+        tableProtein[0][tProteinIdx + 1].replace(/[a-zA-Z]/g, "")
+      ) {
+        this.ocrProtein = 0;
+      }
+
+      const tableFat = table.filter((item) => {
+        return item.findIndex((txt) => txt === "지방") > -1;
+      });
+      const tFatIdx = tableFat[0].findIndex((item) => item.includes("지방"));
+      if (this.ocrFat !== tableFat[0][tFatIdx + 1].replace(/[a-zA-Z]/g, "")) {
+        this.ocrFat = 0;
+      }
+
+      const tableCarbohydrate = table.filter((item) => {
+        return item?.findIndex((txt) => txt === "탄수화물") > -1;
+      });
+      const tCarbohydrateIdx = tableCarbohydrate[0].findIndex((item) =>
+        item.includes("탄수화물")
+      );
+
+      if (
+        this.ocrCarbohydrate !==
+        tableCarbohydrate[0][tCarbohydrateIdx + 1].replace(/[a-zA-Z]/g, "")
+      ) {
+        this.ocrCarbohydrate = 0;
+      }
+      this.ocrProduct = raw[0];
+      console.log(this.ocrProduct);
+      console.log(this.ocrProtein);
+      console.log(this.ocrCarbohydrate);
+      console.log(this.ocrFat);
+      console.log(this.ocrCalories);
+      console.log(this.ocrServingWT);
+      await this.ocrPostDiet();
+      this.getDiet();
+      this.getCalories();
     },
     onSearch() {
       this.searchDialog = true;

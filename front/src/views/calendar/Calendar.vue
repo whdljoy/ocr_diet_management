@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dark__wrapper">
     <calendarHeader />
     <div class="calendar__container">
       <p-calendar
@@ -169,10 +169,10 @@ export default {
     --day-border: 1px solid #b8c2cc;
     --day-border-highlight: 1px solid #b8c2cc;
     --day-width: 90px;
-    --day-height: 150px;
+    --day-height: 160px;
     --weekday-bg: #f8fafc;
     --weekday-border: 1px solid #eaeaea;
-    border-radius: 0;
+    border-radius: 3;
     width: 100%;
     height: 100%;
     & .vc-header {
@@ -214,7 +214,7 @@ export default {
     }
   }
   .today {
-    background-color: #f5f7cf;
+    background-color: #effaf3;
   }
 }
 </style>
