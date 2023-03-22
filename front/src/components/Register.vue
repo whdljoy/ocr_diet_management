@@ -215,7 +215,7 @@ export default {
         return;
       }
       this.loading = true;
-      const result = this.reqPostUser({
+      const result = await this.reqPostUser({
         ...(this.email && { email: this.email }),
         ...(this.password && { password: this.password }),
         ...(this.name && { name: this.name }),
@@ -228,7 +228,7 @@ export default {
         ...(this.purpose && { purpose: this.purpose }),
       });
       this.loading = false;
-      if (result.success) {
+      if (result.status === 200) {
         this.$emit("close");
       }
     },

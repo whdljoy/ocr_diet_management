@@ -220,19 +220,19 @@ export default {
       const eachDay = this?.monthCalories.filter((item) => {
         return item.day === this.date.getDate();
       });
-      return eachDay[0]?.fat || 0;
+      return eachDay[0]?.fat * 9 || 0;
     },
     totalProtein() {
       const eachDay = this?.monthCalories.filter((item) => {
         return item.day === this.date.getDate();
       });
-      return eachDay[0]?.protein || 0;
+      return eachDay[0]?.protein * 4 || 0;
     },
     totalCarbohydrate() {
       const eachDay = this?.monthCalories.filter((item) => {
         return item.day === this.date.getDate();
       });
-      return eachDay[0]?.carbohydrate || 0;
+      return eachDay[0]?.carbohydrate * 4 || 0;
     },
   },
   watch: {
