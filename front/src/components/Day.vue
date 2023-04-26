@@ -332,26 +332,17 @@ export default {
       if (this.loading) {
         return;
       }
-
       this.loading = true;
       const result = await this.reqPostDiet({
         ...(this.userId && { userUuid: this.userId }),
         ...(this.ocrProduct && {
           productName: this.ocrProduct,
         }),
-        ...(this.ocrCarbohydrate && {
-          carbohydrate: this.ocrCarbohydrate,
-        }),
-        ...(this.ocrProtein && {
-          protein: this.ocrProtein,
-        }),
-        ...(this.ocrFat && { fat: this.ocrFat }),
-        ...(this.ocrCalories && {
-          eachCalories: this.ocrCalories,
-        }),
-        ...(this.ocrServingWT && {
-          servingWT: this.ocrServingWT,
-        }),
+        carbohydrate: this.ocrCarbohydrate,
+        protein: this.ocrProtein,
+        fat: this.ocrFat,
+        eachCalories: this.ocrCalories,
+        servingWT: this.ocrServingWT,
         date: dateFormat.getDateFormat(this.date, "yyyy-MM-dd"),
       });
       this.loading = false;
@@ -370,7 +361,6 @@ export default {
       const raw = result.data.fields.map((item) => {
         return item.inferText;
       });
-
       const table = result.data.tables[result.data.tables.length - 1].cells
         .map((item) => {
           return item.cellTextLines[0].cellWords;
@@ -385,7 +375,6 @@ export default {
       if (proteinIdx > -1) {
         this.ocrProtein = raw[proteinIdx + 1].replace(/[a-zA-Z]/g, "");
       }
-
       const fatIdx = raw?.findIndex((item) => item.includes("지방"));
       if (fatIdx > -1) {
         this.ocrFat = raw[fatIdx + 1].replace(/[a-zA-Z]/g, "");
@@ -409,49 +398,65 @@ export default {
       if (servingIdx > -1) {
         this.ocrServingWT = raw[servingIdx - 1].replace(/[a-zA-Z]/g, "") || 0;
       }
-
+      // table에서 단백질
       const tableProtein = table.filter((item) => {
         return item?.findIndex((txt) => txt === "단백질") > -1;
       });
+      const tProteinIdx =
+        tableProtein.length > 0
+          ? tableProtein[0]?.findIndex((item) => item.includes("단백질"))
+          : -1;
 
-      const tProteinIdx = tableProtein[0].findIndex((item) =>
-        item.includes("단백질")
-      );
-      if (
-        this.ocrProtein !==
-        tableProtein[0][tProteinIdx + 1].replace(/[a-zA-Z]/g, "")
-      ) {
-        this.ocrProtein = 0;
+      if (this.ocrProtein === 0 && this.tProteinIdx !== -1) {
+        this.ocrProtein = tableProtein[0][tProteinIdx + 1].replace(
+          /[a-zA-Z]/g,
+          ""
+        );
       }
-
+      // table에서 지방
       const tableFat = table.filter((item) => {
         return item.findIndex((txt) => txt === "지방") > -1;
       });
-      const tFatIdx = tableFat[0].findIndex((item) => item.includes("지방"));
-      if (this.ocrFat !== tableFat[0][tFatIdx + 1].replace(/[a-zA-Z]/g, "")) {
-        this.ocrFat = 0;
-      }
+      const tFatIdx =
+        tableFat.length > 0
+          ? tableFat[0].findIndex((item) => item.includes("지방"))
+          : -1;
 
+      if (this.ocrFat === 0 && this.tFatIdx !== -1) {
+        this.ocrFat = tableFat[0][tFatIdx + 1].replace(/[a-zA-Z]/g, "");
+      }
+      //table에서 탄수화물
       const tableCarbohydrate = table.filter((item) => {
         return item?.findIndex((txt) => txt === "탄수화물") > -1;
       });
-      const tCarbohydrateIdx = tableCarbohydrate[0].findIndex((item) =>
-        item.includes("탄수화물")
-      );
+      const tCarbohydrateIdx =
+        tableCarbohydrate.length > 0
+          ? tableCarbohydrate[0].findIndex((item) => item.includes("탄수화물"))
+          : -1;
 
-      if (
-        this.ocrCarbohydrate !==
-        tableCarbohydrate[0][tCarbohydrateIdx + 1].replace(/[a-zA-Z]/g, "")
-      ) {
+      if (this.ocrCarbohydrate === 0 && this.tCarbohydrateIdx !== -1) {
+        this.ocrCarbohydrate = tableCarbohydrate[0][
+          tCarbohydrateIdx + 1
+        ].replace(/[a-zA-Z]/g, "");
+      }
+
+      this.ocrProduct = raw[0];
+      if (isNaN(this.ocrProtein) || this.ocrProtein == "") {
+        this.ocrProtein = 0;
+      }
+      if (isNaN(this.ocrCarbohydrate) || this.ocrCarbohydrate == "") {
         this.ocrCarbohydrate = 0;
       }
-      this.ocrProduct = raw[0];
-      console.log(this.ocrProduct);
-      console.log(this.ocrProtein);
-      console.log(this.ocrCarbohydrate);
-      console.log(this.ocrFat);
-      console.log(this.ocrCalories);
-      console.log(this.ocrServingWT);
+      if (isNaN(this.ocrFat) || this.ocrFat == "") {
+        this.ocrFat = 0;
+      }
+      if (isNaN(this.ocrCalories) || this.ocrCalories == "") {
+        this.ocrCalories = 0;
+      }
+      if (isNaN(this.ocrServingWT) || this.ocrServingWT == "") {
+        this.ocrServingWT = 0;
+      }
+
       await this.ocrPostDiet();
       this.getDiet();
       this.getCalories();

@@ -24,11 +24,11 @@ export async function postDiet({
   const data = {
     ...(userUuid && { userUuid }),
     ...(productName && { productName }),
-    ...(carbohydrate && { carbohydrate }),
-    ...(protein && { protein }),
-    ...(fat && { fat }),
-    ...(eachCalories && { eachCalories }),
-    ...(servingWT && { servingWT }),
+    carbohydrate,
+    protein,
+    fat,
+    eachCalories,
+    servingWT,
     date,
   };
   return this.getMethod("post", {

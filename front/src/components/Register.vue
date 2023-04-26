@@ -11,12 +11,12 @@
         <h2 class="text-h2-bold text-center">회원 가입</h2>
         <v-icon @click="closeDialog">mdi-close-thick</v-icon>
       </div>
-      <template v-if="tab === 'user'">
+      <div v-if="tab === 'user'">
         <p-input label="아이디" v-model="email" />
         <p-input type="password" label="비밀번호" v-model="password" />
         <p-input label="이름" v-model="name" />
         <p-input label="닉네임" v-model="nickname" />
-      </template>
+      </div>
       <template v-else-if="tab === 'info'">
         <p-input label="키" v-model="height" suffix="cm" />
         <p-input label="몸무게" v-model="weight" suffix="kg" />

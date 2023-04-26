@@ -25,11 +25,11 @@ export default (apiInstance) => ({
     const result = await apiInstance.calendar.postDiet({
       ...(userUuid && { userUuid }),
       ...(productName && { productName }),
-      ...(carbohydrate && { carbohydrate }),
-      ...(protein && { protein }),
-      ...(fat && { fat }),
-      ...(eachCalories && { eachCalories }),
-      ...(servingWT && { servingWT }),
+      carbohydrate,
+      protein,
+      fat,
+      eachCalories,
+      servingWT,
       date,
     });
   },
