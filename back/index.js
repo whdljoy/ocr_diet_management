@@ -95,7 +95,7 @@ app.post("/calendar/ocr", upload.single("image"), (req, res) => {
   const base64 = fs.readFileSync(image.path).toString("base64");
   axios
     .post(
-      "https://12jvkdr39x.apigw.ntruss.com/custom/v1/20703/66ede7455e33baa0073a7ded373247895ae2419eb86a5cf3774382a3d305f389/general",
+      "Secret URL",
       {
         images: [
           {
@@ -114,7 +114,7 @@ app.post("/calendar/ocr", upload.single("image"), (req, res) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-OCR-SECRET": "TFl6c2JqYXZKVWZjcEtyRXZ0TmRFY0JQQnFqZmlTZGI=",
+          "X-OCR-SECRET": "Secret Key",
         },
       }
     )
